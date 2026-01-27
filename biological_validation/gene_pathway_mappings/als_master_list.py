@@ -1,0 +1,199 @@
+"""
+ALS Gene-to-Pathway Mappings
+Auto-generated from gene_pathway_raw.csv
+Last updated: January 2026
+"""
+
+GENE_PATHWAY_METADATA = {
+    "ALS2": {
+        "primary": "Endosomal and Vesicular Trafficking",
+        "secondary": [],
+        "mechanism": "Encodes a factor for Rab5; mutations impair endosome motility and fusion with lysosomes, reducing the degradation of cargo and increasing motor neuron vulnerability."
+    },
+    "ANG": {
+        "primary": "RNA Metabolism and Ribostasis",
+        "secondary": [],
+        "mechanism": "Loss-of-function mutations diminish its ribonucleolytic activity and nuclear localisation, which are critical for ribosomal biogenesis and motor neuron survival."
+    },
+    "ANXA11": {
+        "primary": "Endosomal and Vesicular Trafficking",
+        "secondary": ['Protein Homeostasis (Proteostasis) and Degradation'],
+        "mechanism": "Mutations disrupt ER-to-Golgi vesicular transport by impairing phospholipid vesicle formation. This leads to impaired protein clearance and the formation of annexin A11-positive aggregates in motor neurons, contributing to proteostasis failure."
+    },
+    "C9orf72": {
+        "primary": "RNA Metabolism and Ribostasis",
+        "secondary": ['Protein Homeostasis (Proteostasis) and Degradation', 'Glutamate-Mediated Excitotoxicity'],
+        "mechanism": "Mutations lead to the upregulation of GluA1 AMPA receptors and increased calcium permeability, making motor neurons hypersensitive to glutamate-induced death."
+    },
+    "CHCHD10": {
+        "primary": "Mitochondrial Dysfunction and Oxidative Stress",
+        "secondary": [],
+        "mechanism": "Mutations disrupt cristae integrity and mitochondrial genome stability, leading to fragmentation of the mitochondrial network and respiratory chain deficiency."
+    },
+    "CHMP2B": {
+        "primary": "Endosomal and Vesicular Trafficking",
+        "secondary": [],
+        "mechanism": "Disrupts the ESCRT-III complex, leading to dysmorph’ic endosomes and a failure of autophagosomes to fuse with lysosomes for clearance."
+    },
+    "DCTN1": {
+        "primary": "Cytoskeletal Integrity and Axonal Transport",
+        "secondary": [],
+        "mechanism": "Mutations disrupt the dynein-dynactin complex, preventing the retrograde movement of vesicles and organelles along microtubules, leading to motor neuron death."
+    },
+    "ERBB4": {
+        "primary": "Other - Neurotrophic signaling  motor neuron maintenance",
+        "secondary": [],
+        "mechanism": "ERBB4 encodes a receptor, tyrosine kinase, that is specifically expressed in spinal motor neurons and mediates neuregulin-1 (NRG-1) signaling, which is essential for motor neuron survival, axon guidance, and synaptic maintenance. In ALS, reduced autophosphorylation of ErbB4 upon NRG-1 stimulation disrupts this neurotrophic support pathway leading to motor neuron degeneration, axon retraction impaired motor neuron development, and reduced motor function."
+    },
+    "ERLIN1": {
+        "primary": "Protein Homeostasis (Proteostasis) and Degradation",
+        "secondary": [],
+        "mechanism": "Encodes a prohibitin-domain-containing protein located in the ER membrane that forms a ring-shaped complex with ERLIN2. The ERLIN1/2 complex functions as a critical component of ER-associated degradation, forming a bridge between misfolded protein substrates recognized in the ER lumen and E3 ubiquitin ligases located in the Er membrane. Mutations in ERLIN1 disrupt ERAD control, impairing cell's ability to recognize misfolded proteins in the ER, facilitate ubiquitination of ERAD substrates, transport cargo to degradation machinery."
+    },
+    "FIG4": {
+        "primary": "Endosomal and Vesicular Trafficking",
+        "secondary": ['Protein Homeostasis (Proteostasis) and Degradation'],
+        "mechanism": "FIG4 regulates PI(3,5)P2 levels on late endosomal membranes, mediating retrograde trafficking to the trans-Golgi network. Mutations disrupt endosomal transport, causing neuronal vacuolization and motor neuron degeneration. Adult-onset FIG4 mutations can present as ALS-like motor disease."
+    },
+    "FUS": {
+        "primary": "RNA Metabolism and Ribostasis",
+        "secondary": ['Mitochondrial Dysfunction and Oxidative Stress'],
+        "mechanism": "Mutations cause mislocalization of this RNA-binding protein from the nucleus to the cytoplasm. This produces dual pathogenic effects: loss of normal nuclear functions (particularly pre-mRNA splicing) and gain of cytoplasmic toxicity through persistent aggregate formation. These cytoplasmic aggregates directly interact with mitochondrial ATP synthase catalytic subunits, disrupting assembly and reducing ATP synthesis."
+    },
+    "HNRNPA1": {
+        "primary": "RNA Metabolism and Ribostasis",
+        "secondary": [],
+        "mechanism": "Mutations in their prion-like domains promote excessive stress granule assembly, which prevents the proper processing and translation of RNA."
+    },
+    "HNRNPA2B1": {
+        "primary": "RNA Metabolism and Ribostasis",
+        "secondary": [],
+        "mechanism": "Mutations in their prion-like domains promote excessive stress granule assembly, which prevents the proper processing and translation of RNA."
+    },
+    "KIF5A": {
+        "primary": "Cytoskeletal Integrity and Axonal Transport",
+        "secondary": [],
+        "mechanism": "Mutations cause a loss of function in kinesin motors, disrupting the anterograde transport of mitochondria and signalling molecules to distal synaptic sites."
+    },
+    "NEK1": {
+        "primary": "DNA Damage Response and Repair",
+        "secondary": [],
+        "mechanism": "These proteins interact to repair DNA double-strand breaks; mutations result in a failure to repair DNA damage, leading to motor neuron cell death."
+    },
+    "OPTN": {
+        "primary": "Protein Homeostasis (Proteostasis) and Degradation",
+        "secondary": [],
+        "mechanism": "These act as autophagy receptors; mutations prevent the sequestration and transport of damaged organelles and aggregated proteins toward the autophagosome for degradation."
+    },
+    "PLEKHG5": {
+        "primary": "Endosomal and Vesicular Trafficking",
+        "secondary": [],
+        "mechanism": "PLEKHG5 drives unconventional protein secretion of SOD1 via secretory autophagy. It activates Rab26 to trigger exocytosis of autophagosomal cargo through lysosomal-related organelles. Loss of PLEKHG5 causes SOD1 accumulation at presynaptic sites, accelerating ALS disease onset in SOD1 mouse models. Demonstrated in human iPSC-derived motor neurons."
+    },
+    "PRPH": {
+        "primary": "Cytoskeletal Integrity and Axonal Transport",
+        "secondary": [],
+        "mechanism": "PRPH encodes peripherin, a neurofilament protein that self-assembles into intermediate filaments or co-assembles with other neurofilament proteins. Mutations disrupt peripherin assembly, causing large peripherin inclusions in motor neurons and disrupting the neuronal intermediate filament network, impairing cytoskeletal integrity and axonal transport."
+    },
+    "SETX": {
+        "primary": "DNA Damage Response and Repair",
+        "secondary": [],
+        "mechanism": "Encodes a DNA/RNA helicase; mutations impair the ability of neurons to cope with oxidative stress-induced DNA damage."
+    },
+    "SIGMAR1": {
+        "primary": "Mitochondrial Dysfunction and Oxidative Stress",
+        "secondary": [],
+        "mechanism": "Mutations prevent the protein from binding to IP3R at mitochondria-associated ER membranes, causing calcium dysregulation and inducing apoptosis."
+    },
+    "SOD1": {
+        "primary": "Mitochondrial Dysfunction and Oxidative Stress",
+        "secondary": ['Protein Homeostasis (Proteostasis) and Degradation', 'Glutamate-Mediated Excitotoxicity'],
+        "mechanism": "SOD1 mutations impair the protein's conformational stability, causing it to misfold and form toxic oligomers and aggregates. These misfolded species accumulate within mitochondria, inducing membrane vacuolation and impairing the organelle's ability to eliminate reactive oxygen species (ROS). Additionally, mutant SOD1 triggers caspase-3-mediated cleavage of the glutamate transporter EAAT2, reducing glutamate uptake from the synaptic cleft and promoting excitotoxic neuronal firing."
+    },
+    "SPG11": {
+        "primary": "DNA Damage Response and Repair",
+        "secondary": [],
+        "mechanism": "Mutations disrupt the lysosomal-autophagy pathway, leading to lipid accumulation and DNA damage in juvenile forms of ALS."
+    },
+    "SPTLC1": {
+        "primary": "Mitochondrial Dysfunction and Oxidative Stress",
+        "secondary": ['Protein Homeostasis (Proteostasis) and Degradation'],
+        "mechanism": "Mutations disrupt ORMDL-mediated regulation of serine palmitoyltransferase (SPT), resulting in unrestrained sphingolipid byosynthesis and excess ceramide accumulation that induces mitochondrial dysfunction, ER stress, and motor neuron apoptosis."
+    },
+    "SQSTM1": {
+        "primary": "Protein Homeostasis (Proteostasis) and Degradation",
+        "secondary": [],
+        "mechanism": "These act as autophagy receptors; mutations prevent the sequestration and transport of damaged organelles and aggregated proteins toward the autophagosome for degradation."
+    },
+    "SYNE1": {
+        "primary": "Cytoskeletal Integrity and Axonal Transport",
+        "secondary": [],
+        "mechanism": "Loss-of-function mutations disrupt nesprin 1, impairing nuclear envelope-cytoskeleton linkage and nuclear positioning, leading to distal muscle weakness, atrophy, and juvenile-onset motor neuron disease with limb-predominant presentation."
+    },
+    "TARDBP": {
+        "primary": "RNA Metabolism and Ribostasis",
+        "secondary": ['Glutamate-Mediated Excitotoxicity'],
+        "mechanism": "Mutations cause TDP-43 mislocalization from the nucleus to the cytoplasm, resulting in dual pathogenic effects: loss of normal nuclear RNA processing functions and gain of cytoplasmic toxicity through persistent aggregate formation. Nuclear TDP-43 depletion specifically downregulates ADAR2, an enzyme essential for GluA2 RNA editing. Unedited GluA2 increases calcium permeability of AMPA receptors, driving excitotoxic motor neuron loss."
+    },
+    "TBK1": {
+        "primary": "Protein Homeostasis (Proteostasis) and Degradation",
+        "secondary": [],
+        "mechanism": "Haploinsufficiency of this kinase reduces its ability to activate optineurin and p62, thereby stalling the autophagic clearance of protein aggregates and damaged mitochondria."
+    },
+    "TUBA4A": {
+        "primary": "Cytoskeletal Integrity and Axonal Transport",
+        "secondary": [],
+        "mechanism": "Missense mutations interfere with tubulin dimerisation, leading to a destabilised microtubule network and reduced repolymerisation capability."
+    },
+    "UBQLN2": {
+        "primary": "Protein Homeostasis (Proteostasis) and Degradation",
+        "secondary": [],
+        "mechanism": "Normally directs ubiquitinated substrates to the proteasome; mutations impair this clearance pathway, resulting in inclusions that trap p62 and TDP-43."
+    },
+    "UNC13A": {
+        "primary": "RNA Metabolism and Ribostasis",
+        "secondary": ['Glutamate-Mediated Excitotoxicity'],
+        "mechanism": "TDP-43 mislocalization causes aberrant splicing of UNC13A transcripts, leading to pathological cryptic exon inclusion and nonsense-mediated decay of the protein. Loss of UNC13A disrupts synaptic active zone formation, SNARE complex assembly, and neurotransmitter release, impairing motor neuron synaptic function."
+    },
+    "VCP": {
+        "primary": "Protein Homeostasis (Proteostasis) and Degradation",
+        "secondary": [],
+        "mechanism": "Mutations impair the maturation of autophagosomes and the proteasomal degradation of ubiquitinated proteins, leading to the accumulation of TDP-43 and other toxic species."
+    },
+}
+
+GENE_TO_PATHWAY = {
+    "ALS2": ['Endosomal and Vesicular Trafficking'],
+    "ANG": ['RNA Metabolism and Ribostasis'],
+    "ANXA11": ['Endosomal and Vesicular Trafficking', 'Protein Homeostasis (Proteostasis) and Degradation'],
+    "C9orf72": ['RNA Metabolism and Ribostasis', 'Protein Homeostasis (Proteostasis) and Degradation', 'Glutamate-Mediated Excitotoxicity'],
+    "CHCHD10": ['Mitochondrial Dysfunction and Oxidative Stress'],
+    "CHMP2B": ['Endosomal and Vesicular Trafficking'],
+    "DCTN1": ['Cytoskeletal Integrity and Axonal Transport'],
+    "ERBB4": ['Other - Neurotrophic signaling  motor neuron maintenance'],
+    "ERLIN1": ['Protein Homeostasis (Proteostasis) and Degradation'],
+    "FIG4": ['Endosomal and Vesicular Trafficking', 'Protein Homeostasis (Proteostasis) and Degradation'],
+    "FUS": ['RNA Metabolism and Ribostasis', 'Mitochondrial Dysfunction and Oxidative Stress'],
+    "HNRNPA1": ['RNA Metabolism and Ribostasis'],
+    "HNRNPA2B1": ['RNA Metabolism and Ribostasis'],
+    "KIF5A": ['Cytoskeletal Integrity and Axonal Transport'],
+    "NEK1": ['DNA Damage Response and Repair'],
+    "OPTN": ['Protein Homeostasis (Proteostasis) and Degradation'],
+    "PLEKHG5": ['Endosomal and Vesicular Trafficking'],
+    "PRPH": ['Cytoskeletal Integrity and Axonal Transport'],
+    "SETX": ['DNA Damage Response and Repair'],
+    "SIGMAR1": ['Mitochondrial Dysfunction and Oxidative Stress'],
+    "SOD1": ['Mitochondrial Dysfunction and Oxidative Stress', 'Protein Homeostasis (Proteostasis) and Degradation', 'Glutamate-Mediated Excitotoxicity'],
+    "SPG11": ['DNA Damage Response and Repair'],
+    "SPTLC1": ['Mitochondrial Dysfunction and Oxidative Stress', 'Protein Homeostasis (Proteostasis) and Degradation'],
+    "SQSTM1": ['Protein Homeostasis (Proteostasis) and Degradation'],
+    "SYNE1": ['Cytoskeletal Integrity and Axonal Transport'],
+    "TARDBP": ['RNA Metabolism and Ribostasis', 'Glutamate-Mediated Excitotoxicity'],
+    "TBK1": ['Protein Homeostasis (Proteostasis) and Degradation'],
+    "TUBA4A": ['Cytoskeletal Integrity and Axonal Transport'],
+    "UBQLN2": ['Protein Homeostasis (Proteostasis) and Degradation'],
+    "UNC13A": ['RNA Metabolism and Ribostasis', 'Glutamate-Mediated Excitotoxicity'],
+    "VCP": ['Protein Homeostasis (Proteostasis) and Degradation'],
+}
+
+ALL_PATHWAYS = ['Cytoskeletal Integrity and Axonal Transport', 'DNA Damage Response and Repair', 'Endosomal and Vesicular Trafficking', 'Glutamate-Mediated Excitotoxicity', 'Mitochondrial Dysfunction and Oxidative Stress', 'Other - Neurotrophic signaling  motor neuron maintenance', 'Protein Homeostasis (Proteostasis) and Degradation', 'RNA Metabolism and Ribostasis']
