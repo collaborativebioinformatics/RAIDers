@@ -3,3 +3,5 @@ venv/
 .idea/
 __pycache__/
 *.pyc
+biological_validation/gene_pathway_mappings/synthetic_patients_with_clusters.csv
+

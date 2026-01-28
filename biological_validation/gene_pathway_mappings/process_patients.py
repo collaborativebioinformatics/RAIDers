@@ -11,8 +11,11 @@ from biological_validation.gene_pathway_mappings.als_master_list import (
     ALL_PATHWAYS
 )
 
+
 # Load original synthetic data
 df = pd.read_csv("../../nvflare/kmeans/synthetic_patients.csv")
+df_severity = pd.read_csv("synthetic_patients_with_clusters.csv")
+df = df.merge(df_severity[['patient_id', 'cluster']], on='patient_id', how='left')
 
 # Get variant columns from synthetic data
 variant_cols = [col for col in df.columns if col.startswith('geno')]
@@ -28,6 +31,7 @@ for _,patient_row in df.iterrows():
     patient_id = patient_row["patient_id"]
 
     # phase1_cluster: Severity cluster (0=mild, 1, 2, 3, 4=severe) from Phase 1
+    severity_cluster = patient_row["cluster"]
 
     #superpopulation: Ancestry (AFR, AMR, EAS, EUR, SAS)
     superpopulation = patient_row["superpopulation"]
@@ -60,6 +64,7 @@ for _,patient_row in df.iterrows():
     patient_record = {
         'patient_id': patient_id,
         'superpopulation': superpopulation,
+        'severity_cluster': severity_cluster,
         'n_variants': n_variants,
         'n_genes': n_unique_genes,
     }
@@ -67,3 +72,8 @@ for _,patient_row in df.iterrows():
     patient_record.update(patient_binary_pathway)
 
     results.append(patient_record)
+
+# Save results
+results_df = pd.DataFrame(results)
+results_df.to_csv('synthetic_patients_pathways.csv', index=False)
+print(f'Saved {len(results_df)} patients to synthetic_patients_pathways.csv')

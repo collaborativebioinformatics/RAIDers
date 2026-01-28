@@ -101,12 +101,12 @@ def get_pathway_scores(patient_genes, weight_primary = 1.0, weight_secondary = 0
         if gene in GENE_PATHWAY_METADATA:
             # Get primary pathway
             prim_pathway = GENE_PATHWAY_METADATA[gene]['primary']
-            scores[prim_pathway] += weight_primary
+            pathway_scores[f'{prim_pathway}_score'] += weight_primary
 
             for sec_pathway in GENE_PATHWAY_METADATA[gene]['secondary']:
-                scores[sec_pathway] += weight_secondary
+                pathway_scores[f'{sec_pathway}_score'] += weight_secondary
 
-    return scores
+    return pathway_scores
 
 
 
@@ -127,8 +127,9 @@ def get_pathway_binary(pathway_scores) -> dict:
    # value is 0 (for pathway is absent)
    pathway_binary = {f'{pathway}_binary': 0 for pathway in ALL_PATHWAYS}
 
-   for pathway,score in pathway_scores.items():
+   for pathway_with_score_suffix,score in pathway_scores.items():
        if score > 0:
-           pathway_binary[pathway] = 1
+           pathway_name = pathway_with_score_suffix.replace('_score', '')
+           pathway_binary[f'{pathway_name}_binary'] = 1
 
    return pathway_binary
