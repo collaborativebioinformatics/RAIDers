@@ -48,6 +48,7 @@ def load_clinvar_mapping(clinvar_path, validated_genes_only=True):
         print(f"Loaded {len(rsid_to_gene)} rsIDs -> gene mappings (unfiltered)")
         return rsid_to_gene
 
+
 def variant_to_gene(variant_id, rsid_mapping):
     """
     Convert variant ID to gene symbol
@@ -60,8 +61,20 @@ def variant_to_gene(variant_id, rsid_mapping):
     -------
 
     """
-    pass
-def get_pathway_scores(patient_genes, weight_primary = 1.0, weight_secondary = 0.5)
+    # Isolate rsID by removing geno_ prefix
+    rsid = variant_id.replace('geno_', '')
+
+    # Check if rsID is in mapping dictionary
+    if rsid in rsid_mapping:
+        # Return gene if found
+        gene = rsid_mapping[rsid]
+        return gene
+    else:
+        # Return None if rsID does  not exist in mapping
+        return None
+
+
+def get_pathway_scores(patient_genes, weight_primary = 1.0, weight_secondary = 0.5) -> dict:
     """
     Calculate weighted pathway score
     Parameters
@@ -74,16 +87,45 @@ def get_pathway_scores(patient_genes, weight_primary = 1.0, weight_secondary = 0
     -------
 
     """
-    pass
-def get_pathway_binary(pathway_scores):
-    """
-    Convert scores to binary
-    Parameters
-    ----------
-    pathway_scores
+    # Initialize score dictionary
+    scores = {pathway: 0.0 for pathway in ALL_PATHWAYS}
 
-    Returns
-    -------
+    # for each variant gene in the patient's list
+    for gene in patient_genes:
+        # if gene is in metadata pathway
+        if gene in GENE_PATHWAY_METADATA:
+            # Get primary pathway
+            prim_pathway = GENE_PATHWAY_METADATA[gene]['primary']
+            scores[prim_pathway] += weight_primary
 
-    """
-#load_clinvar_mapping("clinvar.cleaned.csv")
+            for sec_pathway in GENE_PATHWAY_METADATA[gene]['secondary']:
+                scores[sec_pathway] += weight_secondary
+
+    return scores
+
+
+
+def get_pathway_binary(pathway_scores) -> dict:
+   """
+   Convert pathway score to binary representation
+   Parameters
+   ----------
+   pathway_scores: dict
+   Dictionary that provides patient's scores (value) for each pathway (key) from get_pathway_scores()
+
+   Returns
+   dict:
+   A dictionary that represents binary representation of pathway presence/absence
+   -------
+   """
+   #Initialize a default dictionary for all pathways where pathway is the key and
+   # value is 0 (for pathway is absent)
+   pathway_binary = {pathway: 0 for pathway in ALL_PATHWAYS}
+
+   for pathway,score in pathway_scores.items():
+       if score > 0:
+           pathway_binary[pathway] = 1
+
+   return pathway_binary
+
+
