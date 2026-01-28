@@ -5,12 +5,6 @@ from pathway_scoring import (
     get_pathway_scores,
     get_pathway_binary
 )
-from biological_validation.gene_pathway_mappings.als_master_list import (
-    GENE_PATHWAY_METADATA,
-    GENE_TO_PATHWAY,
-    ALL_PATHWAYS
-)
-
 
 # Load original synthetic data
 df = pd.read_csv("../../nvflare/kmeans/synthetic_patients.csv")

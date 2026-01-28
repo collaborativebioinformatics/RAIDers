@@ -1,0 +1,41 @@
+cluster,pathway,n_patients,n_affected,prevalence_pct,avg_score
+Control,Cytoskeletal Integrity and Axonal Transport,8582,0,0.0,0.0
+Control,DNA Damage Response and Repair,8582,0,0.0,0.0
+Control,Endosomal and Vesicular Trafficking,8582,0,0.0,0.0
+Control,Glutamate-Mediated Excitotoxicity,8582,0,0.0,0.0
+Control,Mitochondrial Dysfunction and Oxidative Stress,8582,0,0.0,0.0
+Control,Other - Neurotrophic signaling  motor neuron maintenance,8582,0,0.0,0.0
+Control,Protein Homeostasis (Proteostasis) and Degradation,8582,0,0.0,0.0
+Control,RNA Metabolism and Ribostasis,8582,0,0.0,0.0
+Mild,Cytoskeletal Integrity and Axonal Transport,287,0,0.0,0.0
+Mild,DNA Damage Response and Repair,287,138,48.1,1.0
+Mild,Endosomal and Vesicular Trafficking,287,113,39.4,1.0
+Mild,Glutamate-Mediated Excitotoxicity,287,0,0.0,0.0
+Mild,Mitochondrial Dysfunction and Oxidative Stress,287,24,8.4,1.0
+Mild,Other - Neurotrophic signaling  motor neuron maintenance,287,17,5.9,1.0
+Mild,Protein Homeostasis (Proteostasis) and Degradation,287,0,0.0,0.0
+Mild,RNA Metabolism and Ribostasis,287,0,0.0,0.0
+Moderate,Cytoskeletal Integrity and Axonal Transport,845,49,5.8,1.0
+Moderate,DNA Damage Response and Repair,845,172,20.4,1.03
+Moderate,Endosomal and Vesicular Trafficking,845,225,26.6,1.02
+Moderate,Glutamate-Mediated Excitotoxicity,845,17,2.0,0.5
+Moderate,Mitochondrial Dysfunction and Oxidative Stress,845,43,5.1,1.0
+Moderate,Other - Neurotrophic signaling  motor neuron maintenance,845,25,3.0,1.0
+Moderate,Protein Homeostasis (Proteostasis) and Degradation,845,180,21.3,1.0
+Moderate,RNA Metabolism and Ribostasis,845,72,8.5,1.0
+Moderately Severe,Cytoskeletal Integrity and Axonal Transport,3287,112,3.4,1.0
+Moderately Severe,DNA Damage Response and Repair,3287,545,16.6,1.04
+Moderately Severe,Endosomal and Vesicular Trafficking,3287,637,19.4,1.03
+Moderately Severe,Glutamate-Mediated Excitotoxicity,3287,1293,39.3,0.53
+Moderately Severe,Mitochondrial Dysfunction and Oxidative Stress,3287,1220,37.1,1.06
+Moderately Severe,Other - Neurotrophic signaling  motor neuron maintenance,3287,19,0.6,1.0
+Moderately Severe,Protein Homeostasis (Proteostasis) and Degradation,3287,1788,54.4,0.75
+Moderately Severe,RNA Metabolism and Ribostasis,3287,223,6.8,1.02
+Severe,Cytoskeletal Integrity and Axonal Transport,1999,72,3.6,1.01
+Severe,DNA Damage Response and Repair,1999,240,12.0,1.07
+Severe,Endosomal and Vesicular Trafficking,1999,189,9.5,1.03
+Severe,Glutamate-Mediated Excitotoxicity,1999,259,13.0,0.51
+Severe,Mitochondrial Dysfunction and Oxidative Stress,1999,496,24.8,0.82
+Severe,Other - Neurotrophic signaling  motor neuron maintenance,1999,3,0.2,1.0
+Severe,Protein Homeostasis (Proteostasis) and Degradation,1999,1338,66.9,1.07
+Severe,RNA Metabolism and Ribostasis,1999,316,15.8,1.02
