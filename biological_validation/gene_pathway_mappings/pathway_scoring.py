@@ -5,13 +5,18 @@ from biological_validation.gene_pathway_mappings.als_master_list import (
     ALL_PATHWAYS
 )
 
+
+
 def load_clinvar_mapping(clinvar_path, validated_genes_only=True):
     """
-    Load clinvar csv file and convert rsID and genes into a dictionary
+    Load both rsID and chr:pos mappings from Clinvar
+    The 'rsID' column contains either:
+    - Real rsIDs
+    - chr:pos format for variants without rsIDs
     Parameters
     ----------
     clinvar_path: str
-    Path to clinvar csv file
+        File path to Clinvar data
     validated_genes_only: bool, default = True
     if True, only include genes from literature-validated list
 
@@ -88,7 +93,7 @@ def get_pathway_scores(patient_genes, weight_primary = 1.0, weight_secondary = 0
 
     """
     # Initialize score dictionary
-    scores = {pathway: 0.0 for pathway in ALL_PATHWAYS}
+    pathway_scores = {f'{pathway}_score': 0.0 for pathway in ALL_PATHWAYS}
 
     # for each variant gene in the patient's list
     for gene in patient_genes:
@@ -120,12 +125,10 @@ def get_pathway_binary(pathway_scores) -> dict:
    """
    #Initialize a default dictionary for all pathways where pathway is the key and
    # value is 0 (for pathway is absent)
-   pathway_binary = {pathway: 0 for pathway in ALL_PATHWAYS}
+   pathway_binary = {f'{pathway}_binary': 0 for pathway in ALL_PATHWAYS}
 
    for pathway,score in pathway_scores.items():
        if score > 0:
            pathway_binary[pathway] = 1
 
    return pathway_binary
-
-
