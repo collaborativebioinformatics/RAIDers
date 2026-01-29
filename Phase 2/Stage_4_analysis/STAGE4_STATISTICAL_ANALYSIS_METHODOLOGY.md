@@ -76,7 +76,7 @@ Where $W_{gene}$ represents the gene-specific weight (derived from penetrance, e
 
 Pathway prevalence was calculated as the percentage of patients within each severity category who exhibited disruption of each pathway. For a given pathway P and severity category S:
 
-$$Prevalence_{P,S} = \frac{N_{patients\_with\_pathway\_P\_in\_severity\_S}}{N_{total\_patients\_in\_severity\_S}} \times 100$$
+$$Prevalence_{P,S} = \frac{N_{\text{patients with pathway P in severity S}}}{N_{\text{total patients in severity S}}} \times 100$$
 
 Additionally, mean pathway burden scores were calculated for each severity-pathway combination, both across all patients in the category (including zeros) and restricted to only those patients with the pathway disrupted (excluding zeros). The former provides a population-level view of pathway burden, while the latter characterizes the typical burden among affected individuals.
 
@@ -142,7 +142,7 @@ Co-occurrence analysis quantifies the frequency with which pairs of pathways app
 
 **Conditional Co-occurrence:** For pathways A and B, this measure answers the question: "Of patients who have pathway A, what percentage also have pathway B?" Formally:
 
-$$P(B|A) = \frac{N_{patients\_with\_both\_A\_and\_B}}{N_{patients\_with\_A}} \times 100$$
+$$P(B|A) = \frac{N_{\text{patients with both A and B}}}{N_{\text{patients with A}}} \times 100$$
 
 This measure is inherently asymmetric: P(B|A) ≠ P(A|B) unless both pathways have identical prevalence.
 
@@ -484,7 +484,3 @@ The complete analysis pipeline is available in `stage4_complete_analysis.py`. Th
 5. Cirulli ET, Lasseigne BN, Petrovski S, et al. Exome sequencing in amyotrophic lateral sclerosis identifies risk genes and pathways. Science. 2015;347(6229):1436-1441.
 
 ---
-
-*Document generated: Stage 4 Pathway Co-occurrence and Correlation Analysis*
-*Data source: patients_with_pathways_weighted.csv (n=15,000 patients, 6,043 carriers)*
-*Analysis framework: Phase II ALS Pathway Analysis Pipeline*
