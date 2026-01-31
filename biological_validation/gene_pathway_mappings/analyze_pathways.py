@@ -208,7 +208,7 @@ def plot_cooccurence_heatmap(heatmap_matrix, cluster_name, blank_threshold = Non
     plt.tight_layout()
 
     # Save and show
-    #plt.savefig('figure_4_1_pathway_prevalence_heatmap.png', dpi=300, bbox_inches='tight')
+    #plt.savefig(f'figure_4_1_pathway_cooccurrence_heatmap_{cluster_name}.png', dpi=300, bbox_inches='tight')
     plt.show()
     plt.close()
 
@@ -242,26 +242,100 @@ def extract_high_cooccurrence(matrix, cluster_name, threshold = 50):
 
 
 pd.set_option('display.float_format', '{:.2f}'.format)
-cluster_cooccurence_matrices = create_cooccurence_matrix(df)
+#cluster_cooccurence_matrices = create_cooccurence_matrix(df)
 
-for cluster, matrix in cluster_cooccurence_matrices.items():
-    plot_cooccurence_heatmap(matrix, cluster)
+#for cluster, matrix in cluster_cooccurence_matrices.items():
+ #   plot_cooccurence_heatmap(matrix, cluster)
 
 
-all_high_cooccurrence = []
+#all_high_cooccurrence = []
 
-for cluster_name, matrix in cluster_cooccurence_matrices.items():
-    high_pairs = extract_high_cooccurrence(matrix, cluster_name, threshold=50)
-    all_high_cooccurrence.append(high_pairs)
+#for cluster_name, matrix in cluster_cooccurence_matrices.items():
+#    high_pairs = extract_high_cooccurrence(matrix, cluster_name, threshold=50)
+#    all_high_cooccurrence.append(high_pairs)
 
 # Combine all clusters
-high_cooccurrence_df = pd.concat(all_high_cooccurrence, ignore_index=True)
+#high_cooccurrence_df = pd.concat(all_high_cooccurrence, ignore_index=True)
 
-print(high_cooccurrence_df[['cluster', 'pathway_X', 'pathway_Y', 'cooccurence_pct' ]])
+#print(high_cooccurrence_df[['cluster', 'pathway_X', 'pathway_Y', 'cooccurence_pct' ]])
 #high_cooccurrence_df.to_csv('table_4_2_high_cooccurrence_pairs.csv', index=False)
 
 
 ####  #### 4.3 Compare Co-occurrence vs Correlation ####################
 
+def create_correlation_matrix(df, variance_threshold = 0.01):
+    correlation_matrices = {}
+    for cluster in df['severity_label'].unique():
+        cluster_df = df[df['severity_label'] == cluster]
 
+        pathways_with_variance = []
+        for pathway in ALL_PATHWAYS:
+            score_col = f'{pathway}_score'
+            variance = cluster_df[score_col].var()
 
+            if variance > variance_threshold:
+                pathways_with_variance.append(pathway)
+
+        # Step 2: Calculate correlation only for those pathways
+        if len(pathways_with_variance) > 1:  # Need at least 2 pathways to correlate
+            score_columns = [f'{p}_score' for p in pathways_with_variance]
+            pathway_scores = cluster_df[score_columns]
+
+            matrix = pathway_scores.corr(method='pearson')
+
+            matrix.index = pathways_with_variance
+            matrix.columns = pathways_with_variance
+        else:
+            matrix = pd.DataFrame() # Empty
+
+        correlation_matrices[cluster] = matrix
+    return correlation_matrices
+
+def plot_correlation_heatmap(correlation_matrix, cluster_name, blank_threshold = None):
+    if correlation_matrix.empty or len(correlation_matrix) < 2:
+        print(f'Skipping {cluster_name}: insufficient data for correlation heatmap')
+        return
+    # Create display matrix (either full values or with blanking)
+    display_matrix = correlation_matrix.copy()
+    if blank_threshold:
+        # Blank out values below threshold for display
+        display_matrix = display_matrix.map(lambda x: '' if x < blank_threshold else f'{x:.1f}')
+        annot = display_matrix  # Use the blanked strings
+        fmt = ''  # Don't format since we already have strings
+    else:
+        annot = True  # Show all values
+        fmt = '.1f'  # One decimal place
+
+    # Create the heatmap
+    plt.figure(figsize=(12, 10))  # Optional: Adjusts the figure size
+    sns.heatmap(
+        correlation_matrix,
+        annot=annot,  # Annotate with Average scores
+        cmap='RdBu_r',  # Red-Blue Reversed (red = pos, blue = negative)
+        fmt=fmt,  # One decimal place for scores
+        linewidths=0.5,
+        linecolor='gray',
+        cbar_kws={'label': 'Correlation'},  # Label the color bar
+        vmin = -1,
+        vmax = 1
+    )
+
+    # Add title and display the plot
+    plt.title(f'Pathway Correlation Matrix: {cluster_name}', fontsize=14, fontweight='bold')
+    plt.xlabel('Pathway (X)', fontsize=12)
+    plt.ylabel('Pathway (Y)', fontsize=12)
+    plt.xticks(rotation=45, ha='right')
+    plt.yticks(rotation=0)
+    plt.tight_layout()
+
+    # Save and show
+    plt.savefig(f'figure_4_3_pathway_correlation_heatmap_{cluster_name}.png', dpi=300, bbox_inches='tight')
+    plt.show()
+    plt.close()
+
+correlation_matrices = create_correlation_matrix(df)
+for cluster, matrix in correlation_matrices.items():
+    print(f'\n{cluster}: {matrix}')
+
+for cluster, matrix in correlation_matrices.items():
+    plot_correlation_heatmap(matrix, cluster)
