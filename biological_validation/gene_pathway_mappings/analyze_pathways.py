@@ -144,7 +144,7 @@ def prevalence_heatmap(heatmap_data):
 #print(table_4_1.head(10))
 
 
-####  #### 4.2 Pathway Co-occurence Matrices ####################
+####  #### 4.2A Pathway Co-occurence Matrices ####################
 def create_cooccurence_matrix(df):
     cooccurence_matrices = {}
 
@@ -242,10 +242,12 @@ def extract_high_cooccurrence(matrix, cluster_name, threshold = 50):
 
 
 pd.set_option('display.float_format', '{:.2f}'.format)
-#cluster_cooccurence_matrices = create_cooccurence_matrix(df)
+cooccurence_matrices = create_cooccurence_matrix(df)
 
 #for cluster, matrix in cluster_cooccurence_matrices.items():
- #   plot_cooccurence_heatmap(matrix, cluster)
+#    print(f'Cluster {cluster}: {matrix}')
+#for cluster, matrix in cluster_cooccurence_matrices.items():
+    #plot_cooccurence_heatmap(matrix, cluster)
 
 
 #all_high_cooccurrence = []
@@ -261,7 +263,7 @@ pd.set_option('display.float_format', '{:.2f}'.format)
 #high_cooccurrence_df.to_csv('table_4_2_high_cooccurrence_pairs.csv', index=False)
 
 
-####  #### 4.3 Compare Co-occurrence vs Correlation ####################
+######## 4.2B Pathway Correlation Matrices ####################
 
 def create_correlation_matrix(df, variance_threshold = 0.01):
     correlation_matrices = {}
@@ -334,8 +336,128 @@ def plot_correlation_heatmap(correlation_matrix, cluster_name, blank_threshold =
     plt.close()
 
 correlation_matrices = create_correlation_matrix(df)
-for cluster, matrix in correlation_matrices.items():
-    print(f'\n{cluster}: {matrix}')
+#for cluster, matrix in correlation_matrices.items():
+#    print(f'\n{cluster}: {matrix}')
 
-for cluster, matrix in correlation_matrices.items():
-    plot_correlation_heatmap(matrix, cluster)
+#for cluster, matrix in correlation_matrices.items():
+#    plot_correlation_heatmap(matrix, cluster)
+
+######## 4.3 Compare Co-occurrence vs Correlation ####################
+def combine_cooccurrence_correlation(cooccurrence_matrices, correlation_matrices):
+    """
+    Combine cooccurrence and correlation data for scatter plot analysis
+    Parameters
+    ----------
+    cooccurrence_matrices
+    correlation_matrices
+
+    Returns
+    Dataframe
+    -------
+
+    """
+    results = []
+
+    for cluster in cooccurrence_matrices.keys():
+        cooccur_matrix = cooccurrence_matrices[cluster]
+        corr_matrix = correlation_matrices[cluster]
+
+        if cooccur_matrix.empty or corr_matrix.empty:
+            continue
+
+        common_pathways = list(set(cooccur_matrix.index) & set(corr_matrix.index))
+
+        for pathway_X in common_pathways:
+            for pathway_Y in common_pathways:
+                if pathway_X == pathway_Y:
+                    continue
+
+                cooccur_value = cooccur_matrix.loc[pathway_X, pathway_Y]
+                corr_value = corr_matrix.loc[pathway_X, pathway_Y]
+
+                results.append({
+                    'cluster': cluster,
+                    'pathway_X': pathway_X,
+                    'pathway_Y': pathway_Y,
+                    'cooccurrence_pct': cooccur_value,
+                    'correlation': corr_value
+                })
+
+    return pd.DataFrame(results)
+
+def plot_cooccurrence_vs_correlation(combined_df, cluster_name):
+    cluster_data = combined_df[combined_df['cluster'] == cluster_name]
+
+    # Skip if no data
+    if cluster_data.empty:
+        print(f'Skipping {cluster_name}: no overlapping pathway pairs')
+        return
+    plt.figure(figsize=(10, 8))
+
+    # Color-code points by pattern type
+    colors = []
+    for _, row in cluster_data.iterrows():
+        cooccur = row['cooccurrence_pct']
+        corr = row['correlation']
+
+        if cooccur > 50 and corr > 0.5:
+            colors.append('green')  # Upper right: Dose-dependent
+        elif cooccur > 50 and abs(corr) < 0.3:
+            colors.append('orange')  # Lower right: Threshold effect
+        elif cooccur < 30 and corr < -0.3:
+            colors.append('red')  # Lower left: Distinct subtypes
+        else:
+            colors.append('lightgray')  # Other
+
+
+    plt.scatter(
+        x=cluster_data['cooccurrence_pct'],
+        y=cluster_data['correlation'],
+        c = colors,
+        alpha=0.6,
+        s=80,
+    )
+
+    plt.xlabel('Co-occurence (%)', fontsize=12)
+    plt.ylabel(' Pearson Correlation', fontsize=12)
+    plt.title(f'Co-occurrence vs Correlation: {cluster_name}', fontsize=14, fontweight='bold')
+
+    plt.axhline(y=0, color='gray', linestyle='--', linewidth=0.5)
+    plt.axvline(x=50, color='gray', linestyle='--', linewidth=0.5)
+
+    # Add quadrant labels
+    plt.text(75, 0.85, 'Dose-dependent\n(cascading failure)',
+             fontsize=10, ha='center', style='italic', color='darkgreen', weight='bold')
+    plt.text(75, -0.5, 'Threshold effect\n(binary disruption)',
+             fontsize=10, ha='center', style='italic', color='darkorange', weight='bold')
+    plt.text(25, 0.85, 'Rare patterns',
+             fontsize=9, ha='center', style='italic', color='gray')
+    plt.text(25, -0.5, 'Independent/\nDistinct subtypes',
+             fontsize=9, ha='center', style='italic', color='gray')
+
+    plt.xlim(0,100)
+    plt.ylim(-1,1)
+
+    # Add legend
+    from matplotlib.patches import Patch
+    legend_elements = [
+        Patch(facecolor='green', edgecolor='white', label='Dose-dependent (co-occ >50%, r >0.5)'),
+        Patch(facecolor='orange', edgecolor='white', label='Threshold effect (co-occ >50%, |r| <0.3)'),
+        Patch(facecolor='red', edgecolor='white', label='Distinct subtypes (co-occ <30%, r <-0.3)'),
+        Patch(facecolor='lightgray', edgecolor='white', label='Other patterns')
+    ]
+    plt.legend(handles=legend_elements, loc='lower left', fontsize=10, framealpha=0.9)
+
+    # Grid
+    plt.grid(True, alpha=0.2, linestyle=':')
+
+    plt.tight_layout()
+    plt.savefig(f'figure_4_4_cooccurence_vs_correlation_{cluster_name}.png', dpi=300)
+    plt.show()
+    plt.close()
+
+combined_matrices = combine_cooccurrence_correlation( cooccurence_matrices ,correlation_matrices)
+print(combined_matrices)
+
+for cluster_name in combined_matrices['cluster'].unique():
+    plot_cooccurrence_vs_correlation(combined_matrices, cluster_name)
