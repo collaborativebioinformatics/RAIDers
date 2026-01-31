@@ -1,0 +1,17 @@
+cluster,pathway_X,pathway_Y,cooccurence_pct
+Moderate,Glutamate-Mediated Excitotoxicity,RNA Metabolism and Ribostasis,94.11764705882352
+Severe,RNA Metabolism and Ribostasis,Mitochondrial Dysfunction and Oxidative Stress,87.65822784810126
+Severe,Other - Neurotrophic signaling  motor neuron maintenance,Protein Homeostasis (Proteostasis) and Degradation,66.66666666666666
+Severe,Mitochondrial Dysfunction and Oxidative Stress,RNA Metabolism and Ribostasis,55.846774193548384
+Severe,Mitochondrial Dysfunction and Oxidative Stress,Protein Homeostasis (Proteostasis) and Degradation,55.24193548387096
+Severe,Glutamate-Mediated Excitotoxicity,Protein Homeostasis (Proteostasis) and Degradation,94.5945945945946
+Severe,Glutamate-Mediated Excitotoxicity,Mitochondrial Dysfunction and Oxidative Stress,88.41698841698842
+Severe,Endosomal and Vesicular Trafficking,Protein Homeostasis (Proteostasis) and Degradation,73.54497354497354
+Moderately Severe,RNA Metabolism and Ribostasis,Glutamate-Mediated Excitotoxicity,93.27354260089686
+Moderately Severe,Protein Homeostasis (Proteostasis) and Degradation,Mitochondrial Dysfunction and Oxidative Stress,65.6599552572707
+Moderately Severe,Protein Homeostasis (Proteostasis) and Degradation,Glutamate-Mediated Excitotoxicity,63.03131991051454
+Moderately Severe,Other - Neurotrophic signaling  motor neuron maintenance,Protein Homeostasis (Proteostasis) and Degradation,57.89473684210527
+Moderately Severe,Mitochondrial Dysfunction and Oxidative Stress,Protein Homeostasis (Proteostasis) and Degradation,96.22950819672131
+Moderately Severe,Mitochondrial Dysfunction and Oxidative Stress,Glutamate-Mediated Excitotoxicity,91.22950819672131
+Moderately Severe,Glutamate-Mediated Excitotoxicity,Protein Homeostasis (Proteostasis) and Degradation,87.1616395978345
+Moderately Severe,Glutamate-Mediated Excitotoxicity,Mitochondrial Dysfunction and Oxidative Stress,86.07888631090486
