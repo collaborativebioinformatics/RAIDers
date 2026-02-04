@@ -1,0 +1,8 @@
+,Proteostasis,RNA_Metabolism,Cytoskeletal_Axonal_Transport,Mitochondrial,Excitotoxicity,Vesicle_Trafficking,DNA_Damage
+Proteostasis,3644,208,48,1844,1821,421,241
+RNA_Metabolism,208,793,13,479,328,84,55
+Cytoskeletal_Axonal_Transport,48,13,274,37,26,27,14
+Mitochondrial,1844,479,37,2333,1769,274,144
+Excitotoxicity,1821,328,26,1769,2046,248,138
+Vesicle_Trafficking,421,84,27,274,248,1722,627
+DNA_Damage,241,55,14,144,138,627,956

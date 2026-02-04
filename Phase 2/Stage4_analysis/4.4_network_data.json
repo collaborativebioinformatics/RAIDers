@@ -1,0 +1,398 @@
+{
+  "nodes": [
+    {
+      "id": "Proteostasis",
+      "label": "Proteostasis",
+      "size": 3644,
+      "pct": 60.3
+    },
+    {
+      "id": "RNA_Metabolism",
+      "label": "RNA Metabolism",
+      "size": 793,
+      "pct": 13.1
+    },
+    {
+      "id": "Cytoskeletal_Axonal_Transport",
+      "label": "Cytoskeletal Axonal Transport",
+      "size": 274,
+      "pct": 4.5
+    },
+    {
+      "id": "Mitochondrial",
+      "label": "Mitochondrial",
+      "size": 2333,
+      "pct": 38.6
+    },
+    {
+      "id": "Excitotoxicity",
+      "label": "Excitotoxicity",
+      "size": 2046,
+      "pct": 33.9
+    },
+    {
+      "id": "Vesicle_Trafficking",
+      "label": "Vesicle Trafficking",
+      "size": 1722,
+      "pct": 28.5
+    },
+    {
+      "id": "DNA_Damage",
+      "label": "DNA Damage",
+      "size": 956,
+      "pct": 15.8
+    }
+  ],
+  "edges": [
+    {
+      "source": "Proteostasis",
+      "target": "RNA_Metabolism",
+      "weight": 208,
+      "expected": 478.2,
+      "jaccard": 0.049,
+      "odds_ratio": 0.19,
+      "or_ci_lower": 0.16,
+      "or_ci_upper": 0.22,
+      "effect_size": "negligible",
+      "cooc_pct": 26.2,
+      "pearson_r": -0.24,
+      "category": "other",
+      "color": "gray"
+    },
+    {
+      "source": "Proteostasis",
+      "target": "Cytoskeletal_Axonal_Transport",
+      "weight": 48,
+      "expected": 165.2,
+      "jaccard": 0.012,
+      "odds_ratio": 0.13,
+      "or_ci_lower": 0.09,
+      "or_ci_upper": 0.18,
+      "effect_size": "negligible",
+      "cooc_pct": 17.5,
+      "pearson_r": -0.177,
+      "category": "other",
+      "color": "gray"
+    },
+    {
+      "source": "Proteostasis",
+      "target": "Mitochondrial",
+      "weight": 1844,
+      "expected": 1406.8,
+      "jaccard": 0.446,
+      "odds_ratio": 4.0,
+      "or_ci_lower": 3.55,
+      "or_ci_upper": 4.5,
+      "effect_size": "medium",
+      "cooc_pct": 79.0,
+      "pearson_r": 0.319,
+      "category": "other",
+      "color": "gray"
+    },
+    {
+      "source": "Proteostasis",
+      "target": "Excitotoxicity",
+      "weight": 1821,
+      "expected": 1233.8,
+      "jaccard": 0.471,
+      "odds_ratio": 9.63,
+      "or_ci_lower": 8.28,
+      "or_ci_upper": 11.21,
+      "effect_size": "large",
+      "cooc_pct": 89.0,
+      "pearson_r": 0.43,
+      "category": "other",
+      "color": "gray"
+    },
+    {
+      "source": "Proteostasis",
+      "target": "Vesicle_Trafficking",
+      "weight": 421,
+      "expected": 1038.4,
+      "jaccard": 0.085,
+      "odds_ratio": 0.11,
+      "or_ci_lower": 0.1,
+      "or_ci_upper": 0.13,
+      "effect_size": "negligible",
+      "cooc_pct": 24.4,
+      "pearson_r": -0.408,
+      "category": "distinct_subtypes",
+      "color": "red"
+    },
+    {
+      "source": "Proteostasis",
+      "target": "DNA_Damage",
+      "weight": 241,
+      "expected": 576.5,
+      "jaccard": 0.055,
+      "odds_ratio": 0.17,
+      "or_ci_lower": 0.14,
+      "or_ci_upper": 0.2,
+      "effect_size": "negligible",
+      "cooc_pct": 25.2,
+      "pearson_r": -0.278,
+      "category": "other",
+      "color": "gray"
+    },
+    {
+      "source": "RNA_Metabolism",
+      "target": "Cytoskeletal_Axonal_Transport",
+      "weight": 13,
+      "expected": 36.0,
+      "jaccard": 0.012,
+      "odds_ratio": 0.33,
+      "or_ci_lower": 0.19,
+      "or_ci_upper": 0.57,
+      "effect_size": "negligible",
+      "cooc_pct": 4.7,
+      "pearson_r": -0.054,
+      "category": "other",
+      "color": "gray"
+    },
+    {
+      "source": "RNA_Metabolism",
+      "target": "Mitochondrial",
+      "weight": 479,
+      "expected": 306.2,
+      "jaccard": 0.181,
+      "odds_ratio": 2.79,
+      "or_ci_lower": 2.4,
+      "or_ci_upper": 3.25,
+      "effect_size": "medium",
+      "cooc_pct": 60.4,
+      "pearson_r": 0.214,
+      "category": "threshold_effect",
+      "color": "orange"
+    },
+    {
+      "source": "RNA_Metabolism",
+      "target": "Excitotoxicity",
+      "weight": 328,
+      "expected": 268.5,
+      "jaccard": 0.131,
+      "odds_ratio": 1.45,
+      "or_ci_lower": 1.25,
+      "or_ci_upper": 1.69,
+      "effect_size": "negligible",
+      "cooc_pct": 41.4,
+      "pearson_r": 0.088,
+      "category": "other",
+      "color": "gray"
+    },
+    {
+      "source": "RNA_Metabolism",
+      "target": "Vesicle_Trafficking",
+      "weight": 84,
+      "expected": 226.0,
+      "jaccard": 0.035,
+      "odds_ratio": 0.26,
+      "or_ci_lower": 0.21,
+      "or_ci_upper": 0.33,
+      "effect_size": "negligible",
+      "cooc_pct": 10.6,
+      "pearson_r": -0.149,
+      "category": "other",
+      "color": "gray"
+    },
+    {
+      "source": "RNA_Metabolism",
+      "target": "DNA_Damage",
+      "weight": 55,
+      "expected": 125.5,
+      "jaccard": 0.032,
+      "odds_ratio": 0.36,
+      "or_ci_lower": 0.27,
+      "or_ci_upper": 0.48,
+      "effect_size": "negligible",
+      "cooc_pct": 6.9,
+      "pearson_r": -0.095,
+      "category": "other",
+      "color": "gray"
+    },
+    {
+      "source": "Cytoskeletal_Axonal_Transport",
+      "target": "Mitochondrial",
+      "weight": 37,
+      "expected": 105.8,
+      "jaccard": 0.014,
+      "odds_ratio": 0.24,
+      "or_ci_lower": 0.17,
+      "or_ci_upper": 0.34,
+      "effect_size": "negligible",
+      "cooc_pct": 13.5,
+      "pearson_r": -0.108,
+      "category": "other",
+      "color": "gray"
+    },
+    {
+      "source": "Cytoskeletal_Axonal_Transport",
+      "target": "Excitotoxicity",
+      "weight": 26,
+      "expected": 92.8,
+      "jaccard": 0.011,
+      "odds_ratio": 0.2,
+      "or_ci_lower": 0.13,
+      "or_ci_upper": 0.3,
+      "effect_size": "negligible",
+      "cooc_pct": 9.5,
+      "pearson_r": -0.111,
+      "category": "other",
+      "color": "gray"
+    },
+    {
+      "source": "Cytoskeletal_Axonal_Transport",
+      "target": "Vesicle_Trafficking",
+      "weight": 27,
+      "expected": 78.1,
+      "jaccard": 0.014,
+      "odds_ratio": 0.27,
+      "or_ci_lower": 0.18,
+      "or_ci_upper": 0.4,
+      "effect_size": "negligible",
+      "cooc_pct": 9.9,
+      "pearson_r": -0.088,
+      "category": "other",
+      "color": "gray"
+    },
+    {
+      "source": "Cytoskeletal_Axonal_Transport",
+      "target": "DNA_Damage",
+      "weight": 14,
+      "expected": 43.3,
+      "jaccard": 0.012,
+      "odds_ratio": 0.29,
+      "or_ci_lower": 0.17,
+      "or_ci_upper": 0.49,
+      "effect_size": "negligible",
+      "cooc_pct": 5.1,
+      "pearson_r": -0.064,
+      "category": "other",
+      "color": "gray"
+    },
+    {
+      "source": "Mitochondrial",
+      "target": "Excitotoxicity",
+      "weight": 1769,
+      "expected": 789.9,
+      "jaccard": 0.678,
+      "odds_ratio": 38.78,
+      "or_ci_lower": 33.23,
+      "or_ci_upper": 45.27,
+      "effect_size": "large",
+      "cooc_pct": 86.5,
+      "pearson_r": 0.687,
+      "category": "dose_dependent",
+      "color": "green"
+    },
+    {
+      "source": "Mitochondrial",
+      "target": "Vesicle_Trafficking",
+      "weight": 274,
+      "expected": 664.8,
+      "jaccard": 0.072,
+      "odds_ratio": 0.21,
+      "or_ci_lower": 0.18,
+      "or_ci_upper": 0.24,
+      "effect_size": "negligible",
+      "cooc_pct": 15.9,
+      "pearson_r": -0.281,
+      "category": "other",
+      "color": "gray"
+    },
+    {
+      "source": "Mitochondrial",
+      "target": "DNA_Damage",
+      "weight": 144,
+      "expected": 369.1,
+      "jaccard": 0.046,
+      "odds_ratio": 0.24,
+      "or_ci_lower": 0.2,
+      "or_ci_upper": 0.28,
+      "effect_size": "negligible",
+      "cooc_pct": 15.1,
+      "pearson_r": -0.199,
+      "category": "other",
+      "color": "gray"
+    },
+    {
+      "source": "Excitotoxicity",
+      "target": "Vesicle_Trafficking",
+      "weight": 248,
+      "expected": 583.0,
+      "jaccard": 0.07,
+      "odds_ratio": 0.24,
+      "or_ci_lower": 0.2,
+      "or_ci_upper": 0.27,
+      "effect_size": "negligible",
+      "cooc_pct": 14.4,
+      "pearson_r": -0.246,
+      "category": "other",
+      "color": "gray"
+    },
+    {
+      "source": "Excitotoxicity",
+      "target": "DNA_Damage",
+      "weight": 138,
+      "expected": 323.7,
+      "jaccard": 0.048,
+      "odds_ratio": 0.28,
+      "or_ci_lower": 0.23,
+      "or_ci_upper": 0.34,
+      "effect_size": "negligible",
+      "cooc_pct": 14.4,
+      "pearson_r": -0.169,
+      "category": "other",
+      "color": "gray"
+    },
+    {
+      "source": "Vesicle_Trafficking",
+      "target": "DNA_Damage",
+      "weight": 627,
+      "expected": 272.4,
+      "jaccard": 0.306,
+      "odds_ratio": 6.94,
+      "or_ci_lower": 5.98,
+      "or_ci_upper": 8.06,
+      "effect_size": "large",
+      "cooc_pct": 65.6,
+      "pearson_r": 0.375,
+      "category": "other",
+      "color": "gray"
+    }
+  ],
+  "quadrant_config": {
+    "x_axis": {
+      "label": "Co-occurrence (%)",
+      "description": "Percentage of smaller pathway that co-occurs with larger"
+    },
+    "y_axis": {
+      "label": "Pearson Correlation",
+      "description": "Linear correlation between pathway counts"
+    },
+    "categories": {
+      "dose_dependent": {
+        "label": "Dose-dependent (cascading failure)",
+        "color": "green",
+        "criteria": "co-occ >50%, r >0.5",
+        "interpretation": "Strong linear relationship - pathway burden compounds"
+      },
+      "threshold_effect": {
+        "label": "Threshold effect (binary disruption)",
+        "color": "orange",
+        "criteria": "co-occ >50%, |r| <0.3",
+        "interpretation": "High co-occurrence but weak correlation - presence matters, not dose"
+      },
+      "distinct_subtypes": {
+        "label": "Distinct subtypes",
+        "color": "red",
+        "criteria": "co-occ <30%, r <-0.3",
+        "interpretation": "Negative correlation - mutually exclusive pathway patterns"
+      },
+      "other": {
+        "label": "Other patterns",
+        "color": "gray",
+        "criteria": "Does not meet above criteria"
+      }
+    }
+  }
+}

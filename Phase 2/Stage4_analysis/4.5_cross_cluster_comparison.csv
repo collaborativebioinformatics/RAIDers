@@ -1,0 +1,8 @@
+pathway,n_cluster_0,n_cluster_1,n_cluster_2,n_cluster_4,prevalence_cluster_0_pct,prevalence_cluster_1_pct,prevalence_cluster_2_pct,prevalence_cluster_4_pct,trend,chi2_statistic,chi2_neglog10p,cramers_v,cramers_v_corrected,chi2_effect_interpretation,kruskal_H,kruskal_neglog10p,epsilon_squared,eta_squared,kruskal_effect_interpretation,cohens_h_c0_vs_c2,cohens_h_interpretation
+Proteostasis,245,3412,1767,619,0.0,64.6,72.9,24.7,↑ increases mild→severe,,,,,,847.24,182.6,0.1402,0.1398,large,2.046,large
+RNA_Metabolism,245,3412,1767,619,0.0,7.2,26.9,11.6,↑ increases mild→severe,,,,,,437.55,93.8,0.0724,0.072,medium,1.09,large
+Cytoskeletal_Axonal_Transport,245,3412,1767,619,0.0,4.3,3.1,12.0,→ no clear trend,,,,,,99.92,20.8,0.0165,0.016,small,0.351,small
+Mitochondrial,245,3412,1767,619,13.1,46.9,35.5,12.0,↑ increases mild→severe,358.13,76.6,0.243,0.242,small,350.38,74.9,0.058,0.0575,small,0.538,medium
+Excitotoxicity,245,3412,1767,619,0.0,50.4,15.6,8.4,↑ increases mild→severe,,,,,,975.3,210.4,0.1614,0.161,large,0.813,large
+Vesicle_Trafficking,245,3412,1767,619,45.7,34.3,13.6,32.3,↓ decreases mild→severe,287.15,61.2,0.218,0.217,small,285.85,60.9,0.0473,0.0468,small,0.728,medium
+DNA_Damage,245,3412,1767,619,42.0,16.0,9.8,21.6,↓ decreases mild→severe,189.67,40.1,0.177,0.176,small,187.39,39.7,0.031,0.0305,small,0.773,medium
