@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALS Pathway Analysis Dashboard - Stage 4 (Cluster-Based)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-blue: #3b82f6;
+            --accent-green: #22c55e;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-purple: #a855f7;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 1px solid var(--bg-tertiary);
+            margin-bottom: 30px;
+        }
+        
+        h1 { font-size: 2rem; margin-bottom: 10px; }
+        .subtitle { color: var(--text-secondary); font-size: 1.1rem; }
+        
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 20px;
+            background: var(--bg-secondary);
+            padding: 10px;
+            border-radius: 8px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .tab:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+        .tab.active { background: var(--accent-blue); color: white; }
+        
+        .panel {
+            display: none;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .panel.active { display: block; }
+        .panel h2 { margin-bottom: 15px; font-size: 1.4rem; }
+        .panel h3 { margin: 20px 0 10px; font-size: 1.1rem; color: var(--accent-blue); }
+        .panel p { color: var(--text-secondary); margin-bottom: 15px; }
+        
+        .group-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .group-btn {
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        
+        .group-btn:hover { background: var(--bg-primary); }
+        .group-btn.active { background: var(--accent-blue); color: white; }
+        
+        .chart-container {
+            background: var(--bg-primary);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        
+        .chart-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .chart-col {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .heatmap-cell {
+            stroke: var(--bg-primary);
+            stroke-width: 1px;
+        }
+        
+        .axis text {
+            fill: var(--text-secondary);
+            font-size: 11px;
+        }
+        
+        .axis line, .axis path {
+            stroke: var(--bg-tertiary);
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            margin: 15px 0;
+        }
+        
+        .data-table th {
+            background: var(--bg-tertiary);
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            border-bottom: 2px solid var(--bg-primary);
+        }
+        
+        .data-table td {
+            padding: 10px;
+            border-bottom: 1px solid var(--bg-tertiary);
+        }
+        
+        .data-table tr:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .data-table .num { text-align: right; font-family: monospace; }
+        
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 15px 0;
+            padding: 10px;
+            background: var(--bg-tertiary);
+            border-radius: 6px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 12px;
+            border-radius: 2px;
+        }
+        
+        .tooltip {
+            position: fixed;
+            background: var(--bg-tertiary);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 1000;
+            max-width: 300px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .tooltip.visible { opacity: 1; }
+        .tooltip-title { font-weight: 600; margin-bottom: 5px; }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: var(--bg-tertiary);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-large { background: var(--accent-red); }
+        .badge-medium { background: var(--accent-orange); }
+        .badge-small { background: var(--accent-blue); }
+        .badge-negligible { background: var(--bg-tertiary); color: var(--text-secondary); }
+        
+        .insight-box {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid var(--accent-blue);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .insight-box.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: var(--accent-orange);
+        }
+        
+        .insight-box.success {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: var(--accent-green);
+        }
+        
+        .insight-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .cluster-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin: 2px;
+        }
+        
+        .cluster-0 { background: #22c55e; color: white; }
+        .cluster-1 { background: #f59e0b; color: white; }
+        .cluster-2 { background: #ef4444; color: white; }
+        .cluster-4 { background: #a855f7; color: white; }
+        
+        .method-toggle {
+            display: flex;
+            gap: 5px;
+            background: var(--bg-primary);
+            padding: 4px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        
+        .method-btn {
+            padding: 6px 12px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        
+        .method-btn.active {
+            background: var(--accent-blue);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ALS Pathway Analysis Dashboard</h1>
+            <p class="subtitle">Stage 4: Pathway Co-occurrence & Correlation Analysis by Phase 1 Clusters</p>
+        </header>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="overview">Overview</button>
+            <button class="tab" data-tab="fig41">4.1 Prevalence</button>
+            <button class="tab" data-tab="fig42">4.2 Co-occurrence</button>
+            <button class="tab" data-tab="fig43">4.3 Correlation</button>
+            <button class="tab" data-tab="fig44">4.4 Quadrant Plot</button>
+            <button class="tab" data-tab="fig45">4.5 Networks</button>
+            <button class="tab" data-tab="fig46">4.6 Cross-Cluster</button>
+            <button class="tab" data-tab="tables">Tables</button>
+        </div>
+        
+        <!-- Overview Panel -->
+        <div class="panel active" id="overview">
+            <h2>Analysis Overview</h2>
+            <p>Cluster-based pathway analysis using Phase 1 federated K-means clusters. This approach validates biological substructure independent of severity categories.</p>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">15,000</div>
+                    <div class="stat-label">Total Patients</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">6,043</div>
+                    <div class="stat-label">Carriers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">7</div>
+                    <div class="stat-label">Pathways</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">4</div>
+                    <div class="stat-label">Carrier Clusters</div>
+                </div>
+            </div>
+            
+            <h3>Cluster Definitions</h3>
+            <div class="insight-box">
+                <span class="cluster-badge cluster-0">C0: Mild (n=245)</span>
+                <span class="cluster-badge cluster-1">C1: Moderate-A (n=3,412)</span>
+                <span class="cluster-badge cluster-2">C2: Severe (n=1,767)</span>
+                <span class="cluster-badge cluster-4">C4: Moderate-B (n=619)</span>
+                <p style="margin-top: 10px; font-size: 0.85rem; color: var(--text-secondary);">
+                    C1 and C4 are both "Moderate" severity but represent distinct molecular profiles identified through Phase 1 federated clustering.
+                </p>
+            </div>
+            
+            <h3>Key Findings</h3>
+            <div class="insight-box success">
+                <div class="insight-title">🟢 Dose-Dependent (Cascading Failure)</div>
+                <div>Mitochondrial × Excitotoxicity: 86% co-occurrence, r=0.69 — Strong linear relationship suggests shared upstream drivers</div>
+            </div>
+            <div class="insight-box warning">
+                <div class="insight-title">🟠 Threshold Effect (Binary Disruption)</div>
+                <div>RNA Metabolism × Mitochondrial: 60% co-occurrence, r=0.21 — Frequently co-occur but intensity doesn't correlate</div>
+            </div>
+            <div class="insight-box" style="border-color: var(--accent-red);">
+                <div class="insight-title">🔴 Distinct Subtypes</div>
+                <div>Proteostasis × Vesicle Trafficking: 24% co-occurrence, r=-0.41 — Mutually exclusive patterns suggest separate molecular subtypes</div>
+            </div>
+            
+            <h3>Cluster Validation</h3>
+            <p>Clusters 1 and 4 are both "Moderate" severity but show distinct pathway signatures:</p>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Cluster</th>
+                        <th>Proteostasis</th>
+                        <th>Excitotoxicity</th>
+                        <th>Cytoskeletal</th>
+                        <th>Vesicle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="cluster-badge cluster-1">C1 Moderate-A</span></td>
+                        <td class="num">64.6%</td>
+                        <td class="num">50.4%</td>
+                        <td class="num">4.3%</td>
+                        <td class="num">34.3%</td>
+                    </tr>
+                    <tr>
+                        <td><span class="cluster-badge cluster-4">C4 Moderate-B</span></td>
+                        <td class="num">24.7%</td>
+                        <td class="num">8.4%</td>
+                        <td class="num">12.0%</td>
+                        <td class="num">32.3%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Figure 4.1: Prevalence -->
+        <div class="panel" id="fig41">
+            <h2>Figure 4.1: Pathway Prevalence by Cluster</h2>
+            <p>Percentage of patients with each pathway disruption across Phase 1 clusters.</p>
+            
+            <div class="chart-container">
+                <svg id="prevalenceHeatmap" width="900" height="400"></svg>
+            </div>
+            
+            <div class="insight-box">
+                <div class="insight-title">Key Observations</div>
+                <ul style="margin-left: 20px; color: var(--text-secondary);">
+                    <li>C0 (Mild): Dominated by Vesicle (45.7%) and DNA Damage (42.0%), no Proteostasis</li>
+                    <li>C1 (SOD1): Highest Proteostasis (64.6%) and Excitotoxicity (50.4%)</li>
+                    <li>C2 (Severe): Highest Proteostasis (72.9%) and RNA Metabolism (26.9%)</li>
+                    <li>C4 (ALS2): Mixed pattern with highest Cytoskeletal (12.0%)</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Figure 4.2: Co-occurrence -->
+        <div class="panel" id="fig42">
+            <h2>Figure 4.2: Pathway Co-occurrence Matrices</h2>
+            <p>Shows frequency of pathway co-occurrence within each cluster.</p>
+            
+            <div class="group-selector" id="coocGroupSelector"></div>
+            
+            <div class="chart-container">
+                <svg id="cooccurrenceHeatmap" width="650" height="550"></svg>
+            </div>
+            
+            <h3>Top Co-occurrences (Overall)</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Pathway Pair</th>
+                        <th>Count</th>
+                        <th>Odds Ratio</th>
+                        <th>Effect Size</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Mitochondrial × Excitotoxicity</td>
+                        <td class="num">1,769</td>
+                        <td class="num">38.78</td>
+                        <td><span class="badge badge-large">Large</span></td>
+                    </tr>
+                    <tr>
+                        <td>Proteostasis × Excitotoxicity</td>
+                        <td class="num">1,821</td>
+                        <td class="num">9.63</td>
+                        <td><span class="badge badge-large">Large</span></td>
+                    </tr>
+                    <tr>
+                        <td>Vesicle × DNA Damage</td>
+                        <td class="num">627</td>
+                        <td class="num">6.94</td>
+                        <td><span class="badge badge-large">Large</span></td>
+                    </tr>
+                    <tr>
+                        <td>Proteostasis × Mitochondrial</td>
+                        <td class="num">1,844</td>
+                        <td class="num">4.00</td>
+                        <td><span class="badge badge-medium">Medium</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Figure 4.3: Correlation -->
+        <div class="panel" id="fig43">
+            <h2>Figure 4.3: Pathway Correlation Matrices</h2>
+            <p>Spearman and Pearson correlations between pathway counts. Pearson is preferred for detecting linear, dose-dependent relationships.</p>
+            
+            <div class="insight-box" style="margin-bottom: 15px;">
+                <div class="insight-title">Correlation Strength Tiers</div>
+                <p style="margin: 5px 0;"><strong>Strong (|r| ≥ 0.7):</strong> Linear dose-dependent relationship — as one pathway intensifies, the other scales proportionally</p>
+                <p style="margin: 5px 0;"><strong>Moderate (0.3 ≤ |r| < 0.7):</strong> Meaningful association but with variability</p>
+                <p style="margin: 5px 0;"><strong>Weak (|r| < 0.3):</strong> Minimal linear relationship — pathways may co-occur but intensities are independent</p>
+            </div>
+            
+            <div class="method-toggle">
+                <button class="method-btn active" data-method="spearman">Spearman ρ</button>
+                <button class="method-btn" data-method="pearson">Pearson r</button>
+            </div>
+            
+            <div class="group-selector" id="corrGroupSelector"></div>
+            
+            <div class="chart-container">
+                <svg id="correlationHeatmap" width="650" height="550"></svg>
+            </div>
+            
+            <div class="insight-box">
+                <div class="insight-title">Spearman vs Pearson Comparison</div>
+                <p>Max |Spearman - Pearson| = 0.034 → Relationships are approximately linear; both methods agree.</p>
+                <table class="data-table" style="margin-top: 10px;">
+                    <thead>
+                        <tr>
+                            <th>Pathway Pair</th>
+                            <th>Spearman ρ</th>
+                            <th>Pearson r</th>
+                            <th>Δ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Mitochondrial × Excitotoxicity</td>
+                            <td class="num">0.704</td>
+                            <td class="num">0.687</td>
+                            <td class="num">0.017</td>
+                        </tr>
+                        <tr>
+                            <td>Proteostasis × Excitotoxicity</td>
+                            <td class="num">0.437</td>
+                            <td class="num">0.430</td>
+                            <td class="num">0.007</td>
+                        </tr>
+                        <tr>
+                            <td>Proteostasis × Vesicle</td>
+                            <td class="num">-0.442</td>
+                            <td class="num">-0.408</td>
+                            <td class="num">0.034</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Figure 4.4: Quadrant Plot -->
+        <div class="panel" id="fig44">
+            <h2>Figure 4.4: Co-occurrence vs Correlation (Quadrant Analysis)</h2>
+            <p>Classifying pathway relationships by co-occurrence frequency and correlation strength.</p>
+            
+            <div class="group-selector" id="scatterGroupSelector"></div>
+            
+            <div class="chart-container">
+                <svg id="scatterPlot" width="800" height="600"></svg>
+            </div>
+            
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #22c55e;"></div>
+                    <span><strong>Dose-dependent</strong> (co-occ &gt;50%, r &gt;0.5) — Cascading failure</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f59e0b;"></div>
+                    <span><strong>Threshold effect</strong> (co-occ &gt;50%, |r| &lt;0.3) — Binary disruption</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ef4444;"></div>
+                    <span><strong>Distinct subtypes</strong> (co-occ &lt;30%, r &lt;-0.3) — Independent</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #6b7280;"></div>
+                    <span><strong>Other patterns</strong></span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Figure 4.5: Networks -->
+        <div class="panel" id="fig45">
+            <h2>Figure 4.5: Pathway Network Diagrams</h2>
+            <p>Network visualization by cluster. Node size = prevalence, edge thickness = co-occurrence, edge color = category.</p>
+            
+            <div class="group-selector" id="networkGroupSelector"></div>
+            
+            <div class="chart-container">
+                <svg id="networkDiagram" width="800" height="600"></svg>
+            </div>
+            
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background: #22c55e;"></div>Dose-dependent</div>
+                <div class="legend-item"><div class="legend-color" style="background: #f59e0b;"></div>Threshold effect</div>
+                <div class="legend-item"><div class="legend-color" style="background: #ef4444;"></div>Distinct subtypes</div>
+                <div class="legend-item"><div class="legend-color" style="background: #6b7280;"></div>Other</div>
+            </div>
+        </div>
+        
+        <!-- Figure 4.6: Cross-Cluster -->
+        <div class="panel" id="fig46">
+            <h2>Figure 4.6: Cross-Cluster Comparison</h2>
+            <p>How pathway prevalence changes across clusters with effect sizes.</p>
+            
+            <div class="chart-container">
+                <svg id="trendChart" width="900" height="450"></svg>
+            </div>
+            
+            <h3>Statistical Tests (Effect Sizes)</h3>
+            <table class="data-table" id="statsTable">
+                <thead>
+                    <tr>
+                        <th>Pathway</th>
+                        <th>C0 (%)</th>
+                        <th>C1 (%)</th>
+                        <th>C2 (%)</th>
+                        <th>C4 (%)</th>
+                        <th>Trend</th>
+                        <th>ε² (Effect)</th>
+                        <th>Cohen's h</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            
+            <div class="insight-box warning">
+                <div class="insight-title">⚠️ Large Sample Size Warning (n=6,043)</div>
+                <p>With this sample size, nearly all differences are statistically significant. Focus on <strong>effect sizes</strong> (ε², Cohen's h) rather than p-values.</p>
+            </div>
+        </div>
+        
+        <!-- Tables -->
+        <div class="panel" id="tables">
+            <h2>Summary Tables</h2>
+            
+            <h3>Table 4.1: Pathway Prevalence by Cluster</h3>
+            <table class="data-table" id="table41">
+                <thead>
+                    <tr>
+                        <th>Cluster</th>
+                        <th>N</th>
+                        <th>Proteostasis</th>
+                        <th>RNA Metab</th>
+                        <th>Cytoskeletal</th>
+                        <th>Mitochondrial</th>
+                        <th>Excitotoxicity</th>
+                        <th>Vesicle</th>
+                        <th>DNA Damage</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            
+            <h3>Table 4.2: Quadrant Classification</h3>
+            <table class="data-table" id="table42">
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Pathway Pair</th>
+                        <th>Co-occ %</th>
+                        <th>Pearson r</th>
+                        <th>Interpretation</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        // =====================================================================
+        // DATA - Updated with cluster-based analysis
+        // =====================================================================
+        
+        const PATHWAYS = [
+            'Proteostasis', 'RNA_Metabolism', 'Cytoskeletal_Axonal_Transport',
+            'Mitochondrial', 'Excitotoxicity', 'Vesicle_Trafficking', 'DNA_Damage'
+        ];
+        
+        const PATHWAY_LABELS = {
+            'Proteostasis': 'Proteostasis',
+            'RNA_Metabolism': 'RNA Metabolism',
+            'Cytoskeletal_Axonal_Transport': 'Cytoskeletal',
+            'Mitochondrial': 'Mitochondrial',
+            'Excitotoxicity': 'Excitotoxicity',
+            'Vesicle_Trafficking': 'Vesicle',
+            'DNA_Damage': 'DNA Damage'
+        };
+        
+        const PATHWAY_COLORS = {
+            'Proteostasis': '#e41a1c',
+            'RNA_Metabolism': '#377eb8',
+            'Cytoskeletal_Axonal_Transport': '#4daf4a',
+            'Mitochondrial': '#984ea3',
+            'Excitotoxicity': '#ff7f00',
+            'Vesicle_Trafficking': '#a65628',
+            'DNA_Damage': '#f781bf'
+        };
+        
+        const CLUSTERS = {
+            0: { label: 'C0: Mild', n: 245, color: '#22c55e' },
+            1: { label: 'C1: Moderate-A', n: 3412, color: '#f59e0b' },
+            2: { label: 'C2: Severe', n: 1767, color: '#ef4444' },
+            4: { label: 'C4: Moderate-B', n: 619, color: '#a855f7' }
+        };
+        
+        // Prevalence data by cluster
+        const prevalenceData = {
+            0: { Proteostasis: 0, RNA_Metabolism: 0, Cytoskeletal_Axonal_Transport: 0, Mitochondrial: 13.1, Excitotoxicity: 0, Vesicle_Trafficking: 45.7, DNA_Damage: 42.0 },
+            1: { Proteostasis: 64.6, RNA_Metabolism: 7.2, Cytoskeletal_Axonal_Transport: 4.3, Mitochondrial: 46.9, Excitotoxicity: 50.4, Vesicle_Trafficking: 34.3, DNA_Damage: 16.0 },
+            2: { Proteostasis: 72.9, RNA_Metabolism: 26.9, Cytoskeletal_Axonal_Transport: 3.1, Mitochondrial: 35.5, Excitotoxicity: 15.6, Vesicle_Trafficking: 13.6, DNA_Damage: 9.8 },
+            4: { Proteostasis: 24.7, RNA_Metabolism: 11.6, Cytoskeletal_Axonal_Transport: 12.0, Mitochondrial: 12.0, Excitotoxicity: 8.4, Vesicle_Trafficking: 32.3, DNA_Damage: 21.6 }
+        };
+        
+        // Co-occurrence matrices
+        const cooccurrenceData = {
+            Overall: [
+                [3644, 208, 48, 1844, 1821, 421, 241],
+                [208, 793, 13, 479, 328, 84, 55],
+                [48, 13, 274, 37, 26, 27, 14],
+                [1844, 479, 37, 2333, 1769, 274, 144],
+                [1821, 328, 26, 1769, 2046, 248, 138],
+                [421, 84, 27, 274, 248, 1722, 627],
+                [241, 55, 14, 144, 138, 627, 956]
+            ],
+            'C0_Mild': [
+                [0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 32, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 112, 2],
+                [0, 0, 0, 0, 0, 2, 103]
+            ],
+            'C1_Moderate_A': [
+                [2203, 61, 28, 1530, 1538, 267, 143],
+                [61, 246, 3, 49, 229, 34, 29],
+                [28, 3, 146, 25, 21, 20, 7],
+                [1530, 49, 25, 1599, 1523, 194, 101],
+                [1538, 229, 21, 1523, 1718, 205, 109],
+                [267, 34, 20, 194, 205, 1169, 495],
+                [143, 29, 7, 101, 109, 495, 545]
+            ],
+            'C2_Severe': [
+                [1288, 141, 19, 296, 265, 138, 90],
+                [141, 475, 9, 429, 95, 48, 25],
+                [19, 9, 54, 11, 4, 4, 3],
+                [296, 429, 11, 628, 231, 70, 37],
+                [265, 95, 4, 231, 276, 32, 24],
+                [138, 48, 4, 70, 32, 241, 74],
+                [90, 25, 3, 37, 24, 74, 174]
+            ],
+            'C4_Moderate_B': [
+                [153, 6, 1, 18, 18, 16, 8],
+                [6, 72, 1, 1, 4, 2, 1],
+                [1, 1, 74, 1, 1, 3, 4],
+                [18, 1, 1, 74, 15, 10, 6],
+                [18, 4, 1, 15, 52, 11, 5],
+                [16, 2, 3, 10, 11, 200, 56],
+                [8, 1, 4, 6, 5, 56, 134]
+            ]
+        };
+        
+        // Correlation matrices (Spearman)
+        const correlationSpearman = {
+            Overall: [
+                [1.000, -0.258, -0.186, 0.324, 0.437, -0.442, -0.300],
+                [-0.258, 1.000, -0.054, 0.191, 0.070, -0.154, -0.095],
+                [-0.186, -0.054, 1.000, -0.111, -0.112, -0.090, -0.064],
+                [0.324, 0.191, -0.111, 1.000, 0.704, -0.293, -0.209],
+                [0.437, 0.070, -0.112, 0.704, 1.000, -0.257, -0.177],
+                [-0.442, -0.154, -0.090, -0.293, -0.257, 1.000, 0.364],
+                [-0.300, -0.095, -0.064, -0.209, -0.177, 0.364, 1.000]
+            ],
+            'C0_Mild': [
+                [0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 1.000, 0, -0.356, -0.330],
+                [0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, -0.356, 0, 1.000, -0.748],
+                [0, 0, 0, -0.330, 0, -0.748, 1.000]
+            ],
+            'C1_Moderate_A': [
+                [1.000, -0.221, -0.197, 0.603, 0.521, -0.603, -0.338],
+                [-0.221, 1.000, -0.042, -0.137, 0.260, -0.119, -0.032],
+                [-0.197, -0.042, 1.000, -0.126, -0.152, -0.091, -0.065],
+                [0.603, -0.137, -0.126, 1.000, 0.839, -0.435, -0.246],
+                [0.521, 0.260, -0.152, 0.839, 1.000, -0.468, -0.261],
+                [-0.603, -0.119, -0.091, -0.435, -0.468, 1.000, 0.530],
+                [-0.338, -0.032, -0.065, -0.246, -0.261, 0.530, 1.000]
+            ],
+            'C2_Severe': [
+                [1.000, -0.530, -0.139, -0.205, 0.427, -0.125, -0.149],
+                [-0.530, 1.000, -0.041, 0.704, 0.080, -0.064, -0.094],
+                [-0.139, -0.041, 1.000, -0.053, -0.040, -0.032, -0.026],
+                [-0.205, 0.704, -0.053, 1.000, 0.456, -0.055, -0.100],
+                [0.427, 0.080, -0.040, 0.456, 1.000, -0.024, -0.017],
+                [-0.125, -0.064, -0.032, -0.055, -0.024, 1.000, 0.281],
+                [-0.149, -0.094, -0.026, -0.100, -0.017, 0.281, 1.000]
+            ],
+            'C4_Moderate_B': [
+                [1.000, -0.138, -0.199, 0.004, 0.079, -0.266, -0.229],
+                [-0.138, 1.000, -0.118, -0.118, -0.037, -0.229, -0.178],
+                [-0.199, -0.118, 1.000, -0.120, -0.094, -0.223, -0.145],
+                [0.004, -0.118, -0.120, 1.000, 0.159, -0.148, -0.121],
+                [0.079, -0.037, -0.094, 0.159, 1.000, -0.073, -0.089],
+                [-0.266, -0.229, -0.223, -0.148, -0.073, 1.000, 0.108],
+                [-0.229, -0.178, -0.145, -0.121, -0.089, 0.108, 1.000]
+            ]
+        };
+        
+        // Correlation matrices (Pearson)
+        const correlationPearson = {
+            Overall: [
+                [1.000, -0.240, -0.177, 0.319, 0.430, -0.408, -0.278],
+                [-0.240, 1.000, -0.054, 0.214, 0.088, -0.149, -0.095],
+                [-0.177, -0.054, 1.000, -0.108, -0.111, -0.088, -0.064],
+                [0.319, 0.214, -0.108, 1.000, 0.687, -0.281, -0.199],
+                [0.430, 0.088, -0.111, 0.687, 1.000, -0.246, -0.169],
+                [-0.408, -0.149, -0.088, -0.281, -0.246, 1.000, 0.375],
+                [-0.278, -0.095, -0.064, -0.199, -0.169, 0.375, 1.000]
+            ],
+            'C0_Mild': [
+                [0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 1.000, 0, -0.340, -0.310],
+                [0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, -0.340, 0, 1.000, -0.720],
+                [0, 0, 0, -0.310, 0, -0.720, 1.000]
+            ],
+            'C1_Moderate_A': [
+                [1.000, -0.205, -0.188, 0.590, 0.510, -0.580, -0.320],
+                [-0.205, 1.000, -0.040, -0.130, 0.250, -0.110, -0.030],
+                [-0.188, -0.040, 1.000, -0.120, -0.145, -0.085, -0.060],
+                [0.590, -0.130, -0.120, 1.000, 0.820, -0.420, -0.235],
+                [0.510, 0.250, -0.145, 0.820, 1.000, -0.450, -0.250],
+                [-0.580, -0.110, -0.085, -0.420, -0.450, 1.000, 0.515],
+                [-0.320, -0.030, -0.060, -0.235, -0.250, 0.515, 1.000]
+            ],
+            'C2_Severe': [
+                [1.000, -0.510, -0.130, -0.195, 0.415, -0.115, -0.140],
+                [-0.510, 1.000, -0.038, 0.690, 0.075, -0.060, -0.090],
+                [-0.130, -0.038, 1.000, -0.050, -0.038, -0.030, -0.024],
+                [-0.195, 0.690, -0.050, 1.000, 0.445, -0.052, -0.095],
+                [0.415, 0.075, -0.038, 0.445, 1.000, -0.022, -0.015],
+                [-0.115, -0.060, -0.030, -0.052, -0.022, 1.000, 0.270],
+                [-0.140, -0.090, -0.024, -0.095, -0.015, 0.270, 1.000]
+            ],
+            'C4_Moderate_B': [
+                [1.000, -0.130, -0.190, 0.005, 0.075, -0.255, -0.220],
+                [-0.130, 1.000, -0.115, -0.115, -0.035, -0.220, -0.170],
+                [-0.190, -0.115, 1.000, -0.115, -0.090, -0.215, -0.140],
+                [0.005, -0.115, -0.115, 1.000, 0.150, -0.142, -0.115],
+                [0.075, -0.035, -0.090, 0.150, 1.000, -0.070, -0.085],
+                [-0.255, -0.220, -0.215, -0.142, -0.070, 1.000, 0.100],
+                [-0.220, -0.170, -0.140, -0.115, -0.085, 0.100, 1.000]
+            ]
+        };
+        
+        // Scatter plot data (pathway pairs)
+        const scatterData = [
+            { p1: 'Mitochondrial', p2: 'Excitotoxicity', cooc_pct: 86.5, pearson_r: 0.687, category: 'dose_dependent', color: '#22c55e' },
+            { p1: 'RNA_Metabolism', p2: 'Mitochondrial', cooc_pct: 60.4, pearson_r: 0.214, category: 'threshold_effect', color: '#f59e0b' },
+            { p1: 'Proteostasis', p2: 'Vesicle_Trafficking', cooc_pct: 24.4, pearson_r: -0.408, category: 'distinct_subtypes', color: '#ef4444' },
+            { p1: 'Proteostasis', p2: 'Excitotoxicity', cooc_pct: 89.0, pearson_r: 0.430, category: 'other', color: '#6b7280' },
+            { p1: 'Proteostasis', p2: 'Mitochondrial', cooc_pct: 79.1, pearson_r: 0.319, category: 'other', color: '#6b7280' },
+            { p1: 'Vesicle_Trafficking', p2: 'DNA_Damage', cooc_pct: 65.5, pearson_r: 0.375, category: 'other', color: '#6b7280' },
+            { p1: 'RNA_Metabolism', p2: 'Excitotoxicity', cooc_pct: 41.4, pearson_r: 0.088, category: 'other', color: '#6b7280' },
+            { p1: 'Proteostasis', p2: 'RNA_Metabolism', cooc_pct: 26.2, pearson_r: -0.240, category: 'other', color: '#6b7280' },
+            { p1: 'Proteostasis', p2: 'DNA_Damage', cooc_pct: 25.2, pearson_r: -0.278, category: 'other', color: '#6b7280' },
+            { p1: 'Mitochondrial', p2: 'Vesicle_Trafficking', cooc_pct: 15.9, pearson_r: -0.281, category: 'other', color: '#6b7280' },
+            { p1: 'Excitotoxicity', p2: 'Vesicle_Trafficking', cooc_pct: 14.4, pearson_r: -0.246, category: 'other', color: '#6b7280' },
+            { p1: 'Cytoskeletal_Axonal_Transport', p2: 'Mitochondrial', cooc_pct: 13.5, pearson_r: -0.108, category: 'other', color: '#6b7280' }
+        ];
+        
+        // Cross-cluster comparison
+        const crossClusterData = [
+            { pathway: 'Proteostasis', c0: 0, c1: 64.6, c2: 72.9, c4: 24.7, trend: '↑ increases', epsilon_sq: 0.1402, cohens_h: 2.046, effect: 'large' },
+            { pathway: 'RNA_Metabolism', c0: 0, c1: 7.2, c2: 26.9, c4: 11.6, trend: '↑ increases', epsilon_sq: 0.0724, cohens_h: 1.090, effect: 'medium' },
+            { pathway: 'Cytoskeletal_Axonal_Transport', c0: 0, c1: 4.3, c2: 3.1, c4: 12.0, trend: '→ no trend', epsilon_sq: 0.0165, cohens_h: 0.351, effect: 'small' },
+            { pathway: 'Mitochondrial', c0: 13.1, c1: 46.9, c2: 35.5, c4: 12.0, trend: '↑ increases', epsilon_sq: 0.0580, cohens_h: 0.538, effect: 'medium' },
+            { pathway: 'Excitotoxicity', c0: 0, c1: 50.4, c2: 15.6, c4: 8.4, trend: '↑ increases', epsilon_sq: 0.1614, cohens_h: 0.813, effect: 'large' },
+            { pathway: 'Vesicle_Trafficking', c0: 45.7, c1: 34.3, c2: 13.6, c4: 32.3, trend: '↓ decreases', epsilon_sq: 0.0473, cohens_h: 0.728, effect: 'medium' },
+            { pathway: 'DNA_Damage', c0: 42.0, c1: 16.0, c2: 9.8, c4: 21.6, trend: '↓ decreases', epsilon_sq: 0.0310, cohens_h: 0.773, effect: 'medium' }
+        ];
+        
+        let currentCorrMethod = 'spearman';
+        
+        // =====================================================================
+        // UTILITY FUNCTIONS
+        // =====================================================================
+        
+        function showTooltip(content, event) {
+            const tooltip = document.getElementById('tooltip');
+            tooltip.innerHTML = content;
+            tooltip.style.left = (event.clientX + 15) + 'px';
+            tooltip.style.top = (event.clientY + 15) + 'px';
+            tooltip.classList.add('visible');
+        }
+        
+        function hideTooltip() {
+            document.getElementById('tooltip').classList.remove('visible');
+        }
+        
+        function getLabel(pathway) {
+            return PATHWAY_LABELS[pathway] || pathway;
+        }
+        
+        // =====================================================================
+        // TAB NAVIGATION
+        // =====================================================================
+        
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+        
+        // =====================================================================
+        // FIGURE 4.1: PREVALENCE HEATMAP
+        // =====================================================================
+        
+        function renderPrevalenceHeatmap() {
+            const svg = d3.select('#prevalenceHeatmap');
+            svg.selectAll('*').remove();
+            
+            const margin = { top: 60, right: 30, bottom: 100, left: 150 };
+            const width = 900 - margin.left - margin.right;
+            const height = 400 - margin.top - margin.bottom;
+            
+            const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+            
+            const clusterOrder = [0, 1, 2, 4];
+            const cellWidth = width / PATHWAYS.length;
+            const cellHeight = height / clusterOrder.length;
+            
+            const colorScale = d3.scaleSequential(d3.interpolateYlOrRd).domain([0, 75]);
+            
+            // Draw cells
+            clusterOrder.forEach((cluster, i) => {
+                PATHWAYS.forEach((pathway, j) => {
+                    const value = prevalenceData[cluster][pathway];
+                    
+                    g.append('rect')
+                        .attr('x', j * cellWidth)
+                        .attr('y', i * cellHeight)
+                        .attr('width', cellWidth - 2)
+                        .attr('height', cellHeight - 2)
+                        .attr('fill', value > 0 ? colorScale(value) : '#1e293b')
+                        .attr('rx', 4)
+                        .on('mouseenter', (event) => {
+                            showTooltip(`
+                                <div class="tooltip-title">${CLUSTERS[cluster].label}</div>
+                                <div>${getLabel(pathway)}: ${value}%</div>
+                            `, event);
+                        })
+                        .on('mouseleave', hideTooltip);
+                    
+                    // Value label
+                    if (value > 0) {
+                        g.append('text')
+                            .attr('x', j * cellWidth + cellWidth / 2)
+                            .attr('y', i * cellHeight + cellHeight / 2 + 5)
+                            .attr('text-anchor', 'middle')
+                            .attr('fill', value > 40 ? 'white' : '#333')
+                            .attr('font-size', '12px')
+                            .attr('font-weight', '600')
+                            .text(value + '%');
+                    }
+                });
+            });
+            
+            // X-axis labels
+            PATHWAYS.forEach((pathway, j) => {
+                g.append('text')
+                    .attr('x', j * cellWidth + cellWidth / 2)
+                    .attr('y', height + 20)
+                    .attr('text-anchor', 'middle')
+                    .attr('transform', `rotate(-45, ${j * cellWidth + cellWidth / 2}, ${height + 20})`)
+                    .attr('fill', PATHWAY_COLORS[pathway])
+                    .attr('font-size', '11px')
+                    .attr('font-weight', '600')
+                    .text(getLabel(pathway));
+            });
+            
+            // Y-axis labels
+            clusterOrder.forEach((cluster, i) => {
+                g.append('text')
+                    .attr('x', -10)
+                    .attr('y', i * cellHeight + cellHeight / 2 + 5)
+                    .attr('text-anchor', 'end')
+                    .attr('fill', CLUSTERS[cluster].color)
+                    .attr('font-size', '12px')
+                    .attr('font-weight', '600')
+                    .text(CLUSTERS[cluster].label);
+            });
+            
+            // Title
+            svg.append('text')
+                .attr('x', 450)
+                .attr('y', 25)
+                .attr('text-anchor', 'middle')
+                .attr('fill', 'white')
+                .attr('font-size', '14px')
+                .attr('font-weight', '600')
+                .text('Pathway Prevalence (%) by Phase 1 Cluster');
+        }
+        
+        // =====================================================================
+        // FIGURE 4.2: CO-OCCURRENCE HEATMAP
+        // =====================================================================
+        
+        function setupCoocGroupSelector() {
+            const container = document.getElementById('coocGroupSelector');
+            container.innerHTML = '';
+            
+            const groups = ['Overall', 'C0_Mild', 'C1_Moderate_A', 'C2_Severe', 'C4_Moderate_B'];
+            groups.forEach((group, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'group-btn' + (i === 0 ? ' active' : '');
+                btn.textContent = group.replace(/_/g, ' ');
+                btn.addEventListener('click', () => {
+                    container.querySelectorAll('.group-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderCooccurrenceHeatmap(group);
+                });
+                container.appendChild(btn);
+            });
+        }
+        
+        function renderCooccurrenceHeatmap(group = 'Overall') {
+            const svg = d3.select('#cooccurrenceHeatmap');
+            svg.selectAll('*').remove();
+            
+            const margin = { top: 80, right: 30, bottom: 30, left: 120 };
+            const width = 650 - margin.left - margin.right;
+            const height = 550 - margin.top - margin.bottom;
+            
+            const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+            
+            const matrix = cooccurrenceData[group] || cooccurrenceData.Overall;
+            // Exclude diagonal for max calculation
+            const maxVal = d3.max(matrix.flat().filter((v, idx) => {
+                const row = Math.floor(idx / PATHWAYS.length);
+                const col = idx % PATHWAYS.length;
+                return row !== col && v > 0;
+            }));
+            
+            const cellSize = Math.min(width, height) / PATHWAYS.length;
+            const colorScale = d3.scaleSequential(d3.interpolateBlues).domain([0, maxVal]);
+            
+            // Draw cells
+            PATHWAYS.forEach((p1, i) => {
+                PATHWAYS.forEach((p2, j) => {
+                    const value = matrix[i][j];
+                    const isDiagonal = i === j;
+                    
+                    g.append('rect')
+                        .attr('x', j * cellSize)
+                        .attr('y', i * cellSize)
+                        .attr('width', cellSize - 2)
+                        .attr('height', cellSize - 2)
+                        .attr('fill', isDiagonal ? '#1e293b' : (value > 0 ? colorScale(value) : '#1e293b'))
+                        .attr('rx', 3)
+                        .on('mouseenter', (event) => {
+                            if (!isDiagonal) {
+                                showTooltip(`
+                                    <div class="tooltip-title">${getLabel(p1)} × ${getLabel(p2)}</div>
+                                    <div>Co-occurrence: ${value}</div>
+                                `, event);
+                            }
+                        })
+                        .on('mouseleave', hideTooltip);
+                    
+                    // Value label - show ALL non-zero off-diagonal values (no threshold)
+                    if (!isDiagonal && value > 0) {
+                        g.append('text')
+                            .attr('x', j * cellSize + cellSize / 2)
+                            .attr('y', i * cellSize + cellSize / 2 + 4)
+                            .attr('text-anchor', 'middle')
+                            .attr('fill', value > maxVal * 0.5 ? 'white' : '#94a3b8')
+                            .attr('font-size', '9px')
+                            .text(value);
+                    }
+                });
+            });
+            
+            // Labels
+            PATHWAYS.forEach((p, i) => {
+                // Top labels
+                g.append('text')
+                    .attr('x', i * cellSize + cellSize / 2)
+                    .attr('y', -10)
+                    .attr('text-anchor', 'middle')
+                    .attr('transform', `rotate(-45, ${i * cellSize + cellSize / 2}, -10)`)
+                    .attr('fill', PATHWAY_COLORS[p])
+                    .attr('font-size', '10px')
+                    .text(getLabel(p));
+                
+                // Left labels
+                g.append('text')
+                    .attr('x', -10)
+                    .attr('y', i * cellSize + cellSize / 2 + 4)
+                    .attr('text-anchor', 'end')
+                    .attr('fill', PATHWAY_COLORS[p])
+                    .attr('font-size', '10px')
+                    .text(getLabel(p));
+            });
+            
+            // Title
+            svg.append('text')
+                .attr('x', 325)
+                .attr('y', 25)
+                .attr('text-anchor', 'middle')
+                .attr('fill', 'white')
+                .attr('font-size', '14px')
+                .text(`Co-occurrence Matrix: ${group.replace(/_/g, ' ')}`);
+        }
+        
+        // =====================================================================
+        // FIGURE 4.3: CORRELATION HEATMAP
+        // =====================================================================
+        
+        function setupCorrGroupSelector() {
+            const container = document.getElementById('corrGroupSelector');
+            container.innerHTML = '';
+            
+            const groups = ['Overall', 'C0_Mild', 'C1_Moderate_A', 'C2_Severe', 'C4_Moderate_B'];
+            groups.forEach((group, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'group-btn' + (i === 0 ? ' active' : '');
+                btn.textContent = group.replace(/_/g, ' ');
+                btn.addEventListener('click', () => {
+                    container.querySelectorAll('.group-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderCorrelationHeatmap(group);
+                });
+                container.appendChild(btn);
+            });
+            
+            // Method toggle
+            document.querySelectorAll('.method-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.method-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentCorrMethod = btn.dataset.method;
+                    const activeGroup = container.querySelector('.group-btn.active').textContent.replace(/ /g, '_');
+                    renderCorrelationHeatmap(activeGroup);
+                });
+            });
+        }
+        
+        function renderCorrelationHeatmap(group = 'Overall') {
+            const svg = d3.select('#correlationHeatmap');
+            svg.selectAll('*').remove();
+            
+            const margin = { top: 80, right: 30, bottom: 30, left: 120 };
+            const width = 650 - margin.left - margin.right;
+            const height = 550 - margin.top - margin.bottom;
+            
+            const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+            
+            const corrData = currentCorrMethod === 'pearson' ? correlationPearson : correlationSpearman;
+            const matrix = corrData[group] || corrData.Overall;
+            
+            const cellSize = Math.min(width, height) / PATHWAYS.length;
+            const colorScale = d3.scaleDiverging(d3.interpolateRdBu).domain([1, 0, -1]);
+            
+            // Draw cells
+            PATHWAYS.forEach((p1, i) => {
+                PATHWAYS.forEach((p2, j) => {
+                    const value = matrix[i][j];
+                    const isDiagonal = i === j;
+                    
+                    g.append('rect')
+                        .attr('x', j * cellSize)
+                        .attr('y', i * cellSize)
+                        .attr('width', cellSize - 2)
+                        .attr('height', cellSize - 2)
+                        .attr('fill', isDiagonal ? '#1e293b' : (value !== 0 ? colorScale(value) : '#1e293b'))
+                        .attr('rx', 3)
+                        .on('mouseenter', (event) => {
+                            if (!isDiagonal) {
+                                // Tiered reporting
+                                let tier = 'Weak';
+                                if (Math.abs(value) >= 0.7) tier = 'Strong';
+                                else if (Math.abs(value) >= 0.3) tier = 'Moderate';
+                                
+                                showTooltip(`
+                                    <div class="tooltip-title">${getLabel(p1)} × ${getLabel(p2)}</div>
+                                    <div>${currentCorrMethod === 'pearson' ? 'Pearson r' : 'Spearman ρ'}: ${value.toFixed(3)}</div>
+                                    <div>Strength: <strong>${tier}</strong></div>
+                                `, event);
+                            }
+                        })
+                        .on('mouseleave', hideTooltip);
+                    
+                    // Value label - bold for strong correlations (>0.7)
+                    if (!isDiagonal && Math.abs(value) > 0.1) {
+                        const isStrong = Math.abs(value) >= 0.7;
+                        g.append('text')
+                            .attr('x', j * cellSize + cellSize / 2)
+                            .attr('y', i * cellSize + cellSize / 2 + 4)
+                            .attr('text-anchor', 'middle')
+                            .attr('fill', Math.abs(value) > 0.4 ? 'white' : '#94a3b8')
+                            .attr('font-size', isStrong ? '10px' : '9px')
+                            .attr('font-weight', isStrong ? '700' : '400')
+                            .text(value.toFixed(2));
+                    }
+                });
+            });
+            
+            // Labels
+            PATHWAYS.forEach((p, i) => {
+                g.append('text')
+                    .attr('x', i * cellSize + cellSize / 2)
+                    .attr('y', -10)
+                    .attr('text-anchor', 'middle')
+                    .attr('transform', `rotate(-45, ${i * cellSize + cellSize / 2}, -10)`)
+                    .attr('fill', PATHWAY_COLORS[p])
+                    .attr('font-size', '10px')
+                    .text(getLabel(p));
+                
+                g.append('text')
+                    .attr('x', -10)
+                    .attr('y', i * cellSize + cellSize / 2 + 4)
+                    .attr('text-anchor', 'end')
+                    .attr('fill', PATHWAY_COLORS[p])
+                    .attr('font-size', '10px')
+                    .text(getLabel(p));
+            });
+            
+            // Title
+            const methodLabel = currentCorrMethod === 'pearson' ? 'Pearson r' : 'Spearman ρ';
+            svg.append('text')
+                .attr('x', 325)
+                .attr('y', 25)
+                .attr('text-anchor', 'middle')
+                .attr('fill', 'white')
+                .attr('font-size', '14px')
+                .text(`Correlation Matrix (${methodLabel}): ${group.replace(/_/g, ' ')}`);
+        }
+        
+        // =====================================================================
+        // FIGURE 4.4: QUADRANT SCATTER PLOT
+        // =====================================================================
+        
+        function setupScatterGroupSelector() {
+            // For now, just Overall
+        }
+        
+        function renderScatterPlot() {
+            const svg = d3.select('#scatterPlot');
+            svg.selectAll('*').remove();
+            
+            const margin = { top: 50, right: 50, bottom: 70, left: 70 };
+            const width = 800 - margin.left - margin.right;
+            const height = 600 - margin.top - margin.bottom;
+            
+            const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+            
+            const x = d3.scaleLinear().domain([0, 100]).range([0, width]);
+            const y = d3.scaleLinear().domain([-1, 1]).range([height, 0]);
+            
+            // Quadrant backgrounds
+            // Q1: dose-dependent (top-right)
+            g.append('rect')
+                .attr('x', x(50)).attr('y', y(1))
+                .attr('width', x(100) - x(50)).attr('height', y(0.5) - y(1))
+                .attr('fill', 'rgba(34, 197, 94, 0.1)');
+            
+            // Q2: threshold (right, middle)
+            g.append('rect')
+                .attr('x', x(50)).attr('y', y(0.3))
+                .attr('width', x(100) - x(50)).attr('height', y(-0.3) - y(0.3))
+                .attr('fill', 'rgba(245, 158, 11, 0.1)');
+            
+            // Q3: distinct subtypes (bottom-left)
+            g.append('rect')
+                .attr('x', x(0)).attr('y', y(-0.3))
+                .attr('width', x(30) - x(0)).attr('height', y(-1) - y(-0.3))
+                .attr('fill', 'rgba(239, 68, 68, 0.1)');
+            
+            // Quadrant labels
+            g.append('text').attr('x', x(75)).attr('y', y(0.85))
+                .attr('text-anchor', 'middle').attr('fill', '#22c55e').attr('font-size', '12px').attr('font-weight', '600')
+                .text('Dose-dependent');
+            g.append('text').attr('x', x(75)).attr('y', y(0.75))
+                .attr('text-anchor', 'middle').attr('fill', '#22c55e').attr('font-size', '10px')
+                .text('(cascading failure)');
+            
+            g.append('text').attr('x', x(75)).attr('y', y(-0.45))
+                .attr('text-anchor', 'middle').attr('fill', '#f59e0b').attr('font-size', '12px').attr('font-weight', '600')
+                .text('Threshold effect');
+            g.append('text').attr('x', x(75)).attr('y', y(-0.55))
+                .attr('text-anchor', 'middle').attr('fill', '#f59e0b').attr('font-size', '10px')
+                .text('(binary disruption)');
+            
+            g.append('text').attr('x', x(15)).attr('y', y(-0.6))
+                .attr('text-anchor', 'middle').attr('fill', '#ef4444').attr('font-size', '12px').attr('font-weight', '600')
+                .text('Distinct subtypes');
+            
+            g.append('text').attr('x', x(25)).attr('y', y(0.2))
+                .attr('text-anchor', 'middle').attr('fill', '#6b7280').attr('font-size', '11px')
+                .text('Rare patterns');
+            
+            // Threshold lines
+            g.append('line')
+                .attr('x1', x(50)).attr('y1', 0).attr('x2', x(50)).attr('y2', height)
+                .attr('stroke', '#475569').attr('stroke-dasharray', '5,5');
+            
+            g.append('line')
+                .attr('x1', 0).attr('y1', y(0.5)).attr('x2', width).attr('y2', y(0.5))
+                .attr('stroke', '#475569').attr('stroke-dasharray', '5,5');
+            
+            g.append('line')
+                .attr('x1', 0).attr('y1', y(0.3)).attr('x2', width).attr('y2', y(0.3))
+                .attr('stroke', '#475569').attr('stroke-dasharray', '3,3').attr('opacity', 0.5);
+            
+            g.append('line')
+                .attr('x1', 0).attr('y1', y(-0.3)).attr('x2', width).attr('y2', y(-0.3))
+                .attr('stroke', '#475569').attr('stroke-dasharray', '3,3').attr('opacity', 0.5);
+            
+            g.append('line')
+                .attr('x1', x(30)).attr('y1', 0).attr('x2', x(30)).attr('y2', height)
+                .attr('stroke', '#475569').attr('stroke-dasharray', '3,3').attr('opacity', 0.5);
+            
+            // Zero line
+            g.append('line')
+                .attr('x1', 0).attr('y1', y(0)).attr('x2', width).attr('y2', y(0))
+                .attr('stroke', '#64748b').attr('stroke-width', 1);
+            
+            // Data points
+            scatterData.forEach(d => {
+                g.append('circle')
+                    .attr('cx', x(d.cooc_pct))
+                    .attr('cy', y(d.pearson_r))
+                    .attr('r', 10)
+                    .attr('fill', d.color)
+                    .attr('stroke', 'white')
+                    .attr('stroke-width', 2)
+                    .attr('opacity', 0.9)
+                    .on('mouseenter', (event) => {
+                        showTooltip(`
+                            <div class="tooltip-title">${getLabel(d.p1)} × ${getLabel(d.p2)}</div>
+                            <div>Co-occurrence: ${d.cooc_pct}%</div>
+                            <div>Pearson r: ${d.pearson_r.toFixed(3)}</div>
+                            <div>Category: ${d.category.replace(/_/g, ' ')}</div>
+                        `, event);
+                    })
+                    .on('mouseleave', hideTooltip);
+            });
+            
+            // Axes
+            g.append('g')
+                .attr('transform', `translate(0,${height})`)
+                .call(d3.axisBottom(x).tickFormat(d => d + '%'))
+                .selectAll('text').attr('fill', '#94a3b8');
+            
+            g.append('g')
+                .call(d3.axisLeft(y))
+                .selectAll('text').attr('fill', '#94a3b8');
+            
+            // Axis labels
+            svg.append('text')
+                .attr('x', margin.left + width / 2)
+                .attr('y', height + margin.top + 55)
+                .attr('text-anchor', 'middle')
+                .attr('fill', '#94a3b8')
+                .attr('font-size', '12px')
+                .text('Co-occurrence (%)');
+            
+            svg.append('text')
+                .attr('transform', 'rotate(-90)')
+                .attr('x', -(margin.top + height / 2))
+                .attr('y', 20)
+                .attr('text-anchor', 'middle')
+                .attr('fill', '#94a3b8')
+                .attr('font-size', '12px')
+                .text('Pearson Correlation');
+            
+            // Title
+            svg.append('text')
+                .attr('x', 400)
+                .attr('y', 25)
+                .attr('text-anchor', 'middle')
+                .attr('fill', 'white')
+                .attr('font-size', '14px')
+                .attr('font-weight', '600')
+                .text('Co-occurrence vs Correlation: Quadrant Analysis');
+        }
+        
+        // =====================================================================
+        // FIGURE 4.5: NETWORK
+        // =====================================================================
+        
+        // Network data with proper node sizes and edge weights
+        const networkData = {
+            Overall: {
+                nodes: [
+                    { id: 'Proteostasis', size: 3644, pct: 60.3 },
+                    { id: 'RNA_Metabolism', size: 793, pct: 13.1 },
+                    { id: 'Cytoskeletal_Axonal_Transport', size: 274, pct: 4.5 },
+                    { id: 'Mitochondrial', size: 2333, pct: 38.6 },
+                    { id: 'Excitotoxicity', size: 2046, pct: 33.9 },
+                    { id: 'Vesicle_Trafficking', size: 1722, pct: 28.5 },
+                    { id: 'DNA_Damage', size: 956, pct: 15.8 }
+                ],
+                edges: [
+                    { source: 'Proteostasis', target: 'Mitochondrial', weight: 1844, odds_ratio: 4.00, effect_size: 'medium' },
+                    { source: 'Proteostasis', target: 'Excitotoxicity', weight: 1821, odds_ratio: 9.63, effect_size: 'large' },
+                    { source: 'Mitochondrial', target: 'Excitotoxicity', weight: 1769, odds_ratio: 38.78, effect_size: 'large' },
+                    { source: 'Vesicle_Trafficking', target: 'DNA_Damage', weight: 627, odds_ratio: 6.94, effect_size: 'large' },
+                    { source: 'RNA_Metabolism', target: 'Mitochondrial', weight: 479, odds_ratio: 3.42, effect_size: 'large' },
+                    { source: 'Proteostasis', target: 'Vesicle_Trafficking', weight: 421, odds_ratio: 0.48, effect_size: 'negligible' },
+                    { source: 'RNA_Metabolism', target: 'Excitotoxicity', weight: 328, odds_ratio: 2.18, effect_size: 'medium' },
+                    { source: 'Mitochondrial', target: 'Vesicle_Trafficking', weight: 274, odds_ratio: 0.62, effect_size: 'negligible' },
+                    { source: 'Excitotoxicity', target: 'Vesicle_Trafficking', weight: 248, odds_ratio: 0.55, effect_size: 'negligible' },
+                    { source: 'Proteostasis', target: 'DNA_Damage', weight: 241, odds_ratio: 0.38, effect_size: 'negligible' },
+                    { source: 'Proteostasis', target: 'RNA_Metabolism', weight: 208, odds_ratio: 0.38, effect_size: 'negligible' }
+                ]
+            },
+            'C0_Mild': {
+                nodes: [
+                    { id: 'Proteostasis', size: 0, pct: 0 },
+                    { id: 'RNA_Metabolism', size: 0, pct: 0 },
+                    { id: 'Cytoskeletal_Axonal_Transport', size: 0, pct: 0 },
+                    { id: 'Mitochondrial', size: 32, pct: 13.1 },
+                    { id: 'Excitotoxicity', size: 0, pct: 0 },
+                    { id: 'Vesicle_Trafficking', size: 112, pct: 45.7 },
+                    { id: 'DNA_Damage', size: 103, pct: 42.0 }
+                ],
+                edges: [
+                    { source: 'Vesicle_Trafficking', target: 'DNA_Damage', weight: 2, odds_ratio: 0.02, effect_size: 'negligible' }
+                ]
+            },
+            'C1_Moderate_A': {
+                nodes: [
+                    { id: 'Proteostasis', size: 2203, pct: 64.6 },
+                    { id: 'RNA_Metabolism', size: 246, pct: 7.2 },
+                    { id: 'Cytoskeletal_Axonal_Transport', size: 146, pct: 4.3 },
+                    { id: 'Mitochondrial', size: 1599, pct: 46.9 },
+                    { id: 'Excitotoxicity', size: 1718, pct: 50.4 },
+                    { id: 'Vesicle_Trafficking', size: 1169, pct: 34.3 },
+                    { id: 'DNA_Damage', size: 545, pct: 16.0 }
+                ],
+                edges: [
+                    { source: 'Proteostasis', target: 'Mitochondrial', weight: 1530, odds_ratio: 5.12, effect_size: 'large' },
+                    { source: 'Proteostasis', target: 'Excitotoxicity', weight: 1538, odds_ratio: 12.4, effect_size: 'large' },
+                    { source: 'Mitochondrial', target: 'Excitotoxicity', weight: 1523, odds_ratio: 45.2, effect_size: 'large' },
+                    { source: 'Vesicle_Trafficking', target: 'DNA_Damage', weight: 495, odds_ratio: 8.21, effect_size: 'large' },
+                    { source: 'Proteostasis', target: 'Vesicle_Trafficking', weight: 267, odds_ratio: 0.32, effect_size: 'negligible' },
+                    { source: 'RNA_Metabolism', target: 'Excitotoxicity', weight: 229, odds_ratio: 5.67, effect_size: 'large' }
+                ]
+            },
+            'C2_Severe': {
+                nodes: [
+                    { id: 'Proteostasis', size: 1288, pct: 72.9 },
+                    { id: 'RNA_Metabolism', size: 475, pct: 26.9 },
+                    { id: 'Cytoskeletal_Axonal_Transport', size: 54, pct: 3.1 },
+                    { id: 'Mitochondrial', size: 628, pct: 35.5 },
+                    { id: 'Excitotoxicity', size: 276, pct: 15.6 },
+                    { id: 'Vesicle_Trafficking', size: 241, pct: 13.6 },
+                    { id: 'DNA_Damage', size: 174, pct: 9.8 }
+                ],
+                edges: [
+                    { source: 'RNA_Metabolism', target: 'Mitochondrial', weight: 429, odds_ratio: 12.8, effect_size: 'large' },
+                    { source: 'Proteostasis', target: 'Mitochondrial', weight: 296, odds_ratio: 1.24, effect_size: 'negligible' },
+                    { source: 'Proteostasis', target: 'Excitotoxicity', weight: 265, odds_ratio: 6.82, effect_size: 'large' },
+                    { source: 'Mitochondrial', target: 'Excitotoxicity', weight: 231, odds_ratio: 5.94, effect_size: 'large' },
+                    { source: 'Proteostasis', target: 'RNA_Metabolism', weight: 141, odds_ratio: 0.28, effect_size: 'negligible' },
+                    { source: 'Proteostasis', target: 'Vesicle_Trafficking', weight: 138, odds_ratio: 0.62, effect_size: 'negligible' }
+                ]
+            },
+            'C4_Moderate_B': {
+                nodes: [
+                    { id: 'Proteostasis', size: 153, pct: 24.7 },
+                    { id: 'RNA_Metabolism', size: 72, pct: 11.6 },
+                    { id: 'Cytoskeletal_Axonal_Transport', size: 74, pct: 12.0 },
+                    { id: 'Mitochondrial', size: 74, pct: 12.0 },
+                    { id: 'Excitotoxicity', size: 52, pct: 8.4 },
+                    { id: 'Vesicle_Trafficking', size: 200, pct: 32.3 },
+                    { id: 'DNA_Damage', size: 134, pct: 21.6 }
+                ],
+                edges: [
+                    { source: 'Vesicle_Trafficking', target: 'DNA_Damage', weight: 56, odds_ratio: 2.45, effect_size: 'medium' },
+                    { source: 'Proteostasis', target: 'Mitochondrial', weight: 18, odds_ratio: 1.42, effect_size: 'negligible' },
+                    { source: 'Proteostasis', target: 'Excitotoxicity', weight: 18, odds_ratio: 1.85, effect_size: 'medium' },
+                    { source: 'Mitochondrial', target: 'Excitotoxicity', weight: 15, odds_ratio: 3.12, effect_size: 'large' },
+                    { source: 'Proteostasis', target: 'Vesicle_Trafficking', weight: 16, odds_ratio: 0.68, effect_size: 'negligible' }
+                ]
+            }
+        };
+        
+        const EFFECT_COLORS = {
+            'large': '#ef4444',
+            'medium': '#f59e0b',
+            'negligible': '#6b7280'
+        };
+        
+        function setupNetworkGroupSelector() {
+            const container = document.getElementById('networkGroupSelector');
+            container.innerHTML = '';
+            
+            const groups = ['Overall', 'C0_Mild', 'C1_Moderate_A', 'C2_Severe', 'C4_Moderate_B'];
+            groups.forEach((group, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'group-btn' + (i === 0 ? ' active' : '');
+                btn.textContent = group.replace(/_/g, ' ');
+                btn.addEventListener('click', () => {
+                    container.querySelectorAll('.group-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderNetwork(group);
+                });
+                container.appendChild(btn);
+            });
+        }
+        
+        function renderNetwork(group = 'Overall') {
+            const data = networkData[group];
+            if (!data) return;
+            
+            const svg = d3.select('#networkDiagram');
+            svg.selectAll('*').remove();
+            
+            const width = 800;
+            const height = 600;
+            const cx = width / 2;
+            const cy = height / 2;
+            const radius = 200;
+            
+            // Position nodes in a circle
+            const nodePositions = {};
+            data.nodes.forEach((node, i) => {
+                const angle = (2 * Math.PI * i) / data.nodes.length - Math.PI / 2;
+                nodePositions[node.id] = {
+                    x: cx + radius * Math.cos(angle),
+                    y: cy + radius * Math.sin(angle)
+                };
+            });
+            
+            // Draw edges - use log scale for width (matches original)
+            data.edges.forEach(edge => {
+                const source = nodePositions[edge.source];
+                const target = nodePositions[edge.target];
+                
+                const edgeWidth = Math.log(edge.weight + 1) * 2;
+                const edgeColor = EFFECT_COLORS[edge.effect_size] || '#374151';
+                
+                svg.append('line')
+                    .attr('x1', source.x)
+                    .attr('y1', source.y)
+                    .attr('x2', target.x)
+                    .attr('y2', target.y)
+                    .attr('stroke', edgeColor)
+                    .attr('stroke-width', edgeWidth)
+                    .attr('opacity', 0.7)
+                    .attr('class', 'network-edge')
+                    .on('mouseenter', (event) => {
+                        showTooltip(`
+                            <div class="tooltip-title">${getLabel(edge.source)} ↔ ${getLabel(edge.target)}</div>
+                            <div>Co-occurrence: ${edge.weight}</div>
+                            <div>Odds Ratio: ${edge.odds_ratio}</div>
+                            <div>Effect: <span style="color: ${edgeColor}">${edge.effect_size}</span></div>
+                        `, event);
+                    })
+                    .on('mouseleave', hideTooltip);
+            });
+            
+            // Draw nodes - use sqrt/5 + 15 formula (matches original)
+            data.nodes.forEach(node => {
+                const pos = nodePositions[node.id];
+                const nodeRadius = Math.sqrt(node.size) / 5 + 15;
+                
+                svg.append('circle')
+                    .attr('cx', pos.x)
+                    .attr('cy', pos.y)
+                    .attr('r', node.size > 0 ? nodeRadius : 8)
+                    .attr('fill', node.size > 0 ? PATHWAY_COLORS[node.id] : '#374151')
+                    .attr('stroke', 'white')
+                    .attr('stroke-width', 2)
+                    .attr('class', 'network-node')
+                    .on('mouseenter', (event) => {
+                        showTooltip(`
+                            <div class="tooltip-title">${getLabel(node.id)}</div>
+                            <div>Patients: ${node.size}</div>
+                            <div>Prevalence: ${node.pct}%</div>
+                        `, event);
+                    })
+                    .on('mouseleave', hideTooltip);
+                
+                // Percentage label inside node (if size > 0)
+                if (node.size > 0) {
+                    svg.append('text')
+                        .attr('x', pos.x)
+                        .attr('y', pos.y + 4)
+                        .attr('text-anchor', 'middle')
+                        .attr('fill', 'white')
+                        .attr('font-size', '11px')
+                        .attr('font-weight', '600')
+                        .text(`${node.pct}%`);
+                }
+                
+                // Name label outside
+                svg.append('text')
+                    .attr('x', pos.x)
+                    .attr('y', pos.y + (node.size > 0 ? Math.sqrt(node.size) / 5 + 15 : 8) + 15)
+                    .attr('text-anchor', 'middle')
+                    .attr('fill', '#94a3b8')
+                    .attr('font-size', '11px')
+                    .text(getLabel(node.id));
+            });
+            
+            // Count patients
+            const n_patients = group === 'Overall' ? 6043 : 
+                              group === 'C0_Mild' ? 245 :
+                              group === 'C1_Moderate_A' ? 3412 :
+                              group === 'C2_Severe' ? 1767 : 619;
+            
+            // Title
+            svg.append('text')
+                .attr('x', cx)
+                .attr('y', 30)
+                .attr('text-anchor', 'middle')
+                .attr('fill', 'white')
+                .attr('font-size', '14px')
+                .text(`Pathway Network - ${group.replace(/_/g, ' ')} (n=${n_patients})`);
+        }
+        
+        // =====================================================================
+        // FIGURE 4.6: CROSS-CLUSTER TRENDS
+        // =====================================================================
+        
+        function renderCrossCluster() {
+            const svg = d3.select('#trendChart');
+            svg.selectAll('*').remove();
+            
+            const margin = { top: 50, right: 150, bottom: 60, left: 70 };
+            const width = 900 - margin.left - margin.right;
+            const height = 450 - margin.top - margin.bottom;
+            
+            const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+            
+            const clusters = ['C0', 'C1', 'C2', 'C4'];
+            const x = d3.scalePoint().domain(clusters).range([0, width]).padding(0.5);
+            const y = d3.scaleLinear().domain([0, 80]).range([height, 0]);
+            
+            const line = d3.line()
+                .x((d, i) => x(clusters[i]))
+                .y(d => y(d))
+                .defined(d => d !== undefined);
+            
+            // Draw lines for each pathway
+            crossClusterData.forEach(pathway => {
+                const values = [pathway.c0, pathway.c1, pathway.c2, pathway.c4];
+                
+                g.append('path')
+                    .datum(values)
+                    .attr('fill', 'none')
+                    .attr('stroke', PATHWAY_COLORS[pathway.pathway])
+                    .attr('stroke-width', 2.5)
+                    .attr('d', line);
+                
+                // Data points
+                values.forEach((v, i) => {
+                    if (v !== undefined) {
+                        g.append('circle')
+                            .attr('cx', x(clusters[i]))
+                            .attr('cy', y(v))
+                            .attr('r', 5)
+                            .attr('fill', PATHWAY_COLORS[pathway.pathway])
+                            .on('mouseenter', (event) => {
+                                showTooltip(`
+                                    <div class="tooltip-title">${getLabel(pathway.pathway)}</div>
+                                    <div>${clusters[i]}: ${v}%</div>
+                                `, event);
+                            })
+                            .on('mouseleave', hideTooltip);
+                    }
+                });
+            });
+            
+            // Axes
+            g.append('g')
+                .attr('transform', `translate(0,${height})`)
+                .call(d3.axisBottom(x))
+                .selectAll('text').attr('fill', '#94a3b8');
+            
+            g.append('g')
+                .call(d3.axisLeft(y).tickFormat(d => d + '%'))
+                .selectAll('text').attr('fill', '#94a3b8');
+            
+            // Legend
+            const legend = svg.append('g')
+                .attr('transform', `translate(${width + margin.left + 20}, ${margin.top})`);
+            
+            crossClusterData.forEach((pathway, i) => {
+                const ly = i * 22;
+                legend.append('line')
+                    .attr('x1', 0).attr('x2', 20)
+                    .attr('y1', ly).attr('y2', ly)
+                    .attr('stroke', PATHWAY_COLORS[pathway.pathway])
+                    .attr('stroke-width', 2);
+                
+                legend.append('text')
+                    .attr('x', 25)
+                    .attr('y', ly + 4)
+                    .attr('fill', '#94a3b8')
+                    .attr('font-size', '10px')
+                    .text(getLabel(pathway.pathway));
+            });
+            
+            // Title
+            svg.append('text')
+                .attr('x', 450)
+                .attr('y', 25)
+                .attr('text-anchor', 'middle')
+                .attr('fill', 'white')
+                .attr('font-size', '14px')
+                .text('Pathway Prevalence Across Clusters');
+            
+            // Stats table
+            const tbody = document.querySelector('#statsTable tbody');
+            tbody.innerHTML = '';
+            
+            crossClusterData.forEach(d => {
+                const row = document.createElement('tr');
+                const effectClass = d.effect === 'large' ? 'badge-large' : d.effect === 'medium' ? 'badge-medium' : 'badge-small';
+                row.innerHTML = `
+                    <td style="color: ${PATHWAY_COLORS[d.pathway]}; font-weight: 600;">${getLabel(d.pathway)}</td>
+                    <td class="num">${d.c0}%</td>
+                    <td class="num">${d.c1}%</td>
+                    <td class="num">${d.c2}%</td>
+                    <td class="num">${d.c4}%</td>
+                    <td>${d.trend}</td>
+                    <td class="num">${d.epsilon_sq.toFixed(4)}</td>
+                    <td><span class="badge ${effectClass}">${d.cohens_h.toFixed(2)} (${d.effect})</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // =====================================================================
+        // TABLES
+        // =====================================================================
+        
+        function renderTables() {
+            // Table 4.1
+            const tbody41 = document.querySelector('#table41 tbody');
+            tbody41.innerHTML = '';
+            
+            [0, 1, 2, 4].forEach(cluster => {
+                const row = document.createElement('tr');
+                let html = `<td><span class="cluster-badge cluster-${cluster}">${CLUSTERS[cluster].label}</span></td>`;
+                html += `<td class="num">${CLUSTERS[cluster].n}</td>`;
+                
+                PATHWAYS.forEach(p => {
+                    html += `<td class="num">${prevalenceData[cluster][p]}%</td>`;
+                });
+                
+                row.innerHTML = html;
+                tbody41.appendChild(row);
+            });
+            
+            // Table 4.2 - Quadrant classification
+            const tbody42 = document.querySelector('#table42 tbody');
+            tbody42.innerHTML = '';
+            
+            const quadrantRows = [
+                { cat: 'Dose-dependent', pair: 'Mitochondrial × Excitotoxicity', cooc: 86.5, r: 0.687, interp: 'Linear scaling - pathway burden compounds' },
+                { cat: 'Threshold effect', pair: 'RNA Metabolism × Mitochondrial', cooc: 60.4, r: 0.214, interp: 'Presence matters, not dose' },
+                { cat: 'Distinct subtypes', pair: 'Proteostasis × Vesicle', cooc: 24.4, r: -0.408, interp: 'Mutually exclusive patterns' }
+            ];
+            
+            quadrantRows.forEach(d => {
+                const row = document.createElement('tr');
+                const color = d.cat === 'Dose-dependent' ? '#22c55e' : d.cat === 'Threshold effect' ? '#f59e0b' : '#ef4444';
+                row.innerHTML = `
+                    <td style="color: ${color}; font-weight: 600;">${d.cat}</td>
+                    <td>${d.pair}</td>
+                    <td class="num">${d.cooc}%</td>
+                    <td class="num">${d.r.toFixed(3)}</td>
+                    <td>${d.interp}</td>
+                `;
+                tbody42.appendChild(row);
+            });
+        }
+        
+        // =====================================================================
+        // INITIALIZE
+        // =====================================================================
+        
+        function init() {
+            renderPrevalenceHeatmap();
+            
+            setupCoocGroupSelector();
+            renderCooccurrenceHeatmap();
+            
+            setupCorrGroupSelector();
+            renderCorrelationHeatmap();
+            
+            setupScatterGroupSelector();
+            renderScatterPlot();
+            
+            setupNetworkGroupSelector();
+            renderNetwork();
+            
+            renderCrossCluster();
+            renderTables();
+        }
+        
+        init();
+    </script>
+</body>
+</html>
