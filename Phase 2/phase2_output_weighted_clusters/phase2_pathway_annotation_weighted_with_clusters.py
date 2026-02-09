@@ -7,7 +7,7 @@ Annotates patients with pathway scores using:
   2. Gene-Gene Interaction Terms (synergy/redundancy)
   3. Normalized Pathway Burden Scores
 
-Author: [Your name]
+Author: Lynn Kim
 Version: 2.0 (Weighted)
 
 ================================================================================
