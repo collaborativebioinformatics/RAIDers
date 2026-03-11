@@ -14,6 +14,8 @@
 
 **RAIDers** is a federated computational framework for resolving the phenotypic heterogeneity of Amyotrophic Lateral Sclerosis (ALS) while preserving data sovereignty. By integrating global genomic annotations with mechanistic pathway analysis, this framework establishes a scalable architecture for rare disease molecular subtyping.
 
+<img width="6518" height="4170" alt="workflow_flowchart_v3" src="https://github.com/user-attachments/assets/c6cff9cb-5d96-4892-a901-a229b7210376" />
+
 ---
 
 ## 🎯 Scientific Objectives
