@@ -12,165 +12,266 @@
 </p>
 
 
-RAIDers is a federated computational framework designed to resolve the phenotypic heterogeneity of Amyotrophic Lateral Sclerosis (ALS) while maintaining data sovereignty. By synthesizing global genomic annotations with simulated patient cohorts, this framework establishes a scalable architecture for rare disease subtyping.
+**RAIDers** is a federated computational framework for resolving the phenotypic heterogeneity of Amyotrophic Lateral Sclerosis (ALS) while preserving data sovereignty. By integrating global genomic annotations with mechanistic pathway analysis, this framework establishes a scalable architecture for rare disease molecular subtyping.
 
-
----
-
-## Project Overview
-
-Research in rare disease genomics is primarily hindered by extreme data scarcity and institutional data silos mandated by privacy regulations. While authoritative repositories provide critical intelligence on pathogenic variants, these resources are seldom integrated into a unified analytical space. Additionally, due to high variability and low expressivity there is a substantial hetereogenity in present in rare diseases. 
-
-RAIDers addresses this fragmentation by consolidating disparate genomic signals into a high-fidelity feature matrix. This architecture serves as a "Genomic Flight Simulator," validating a federated subtyping pipeline on synthetic data to demonstrate readiness for integration with controlled-access biobank datasets.
-
-##  Scientific Objectives
-
-* **Subtype Discovery:** Identifying coherent molecular signatures across diverse ancestral backgrounds.
-* **Feature Validity:** Confirming that integrated annotations contain sufficient signal to distinguish ALS-associated genes.
-* **Federated Feasibility:** Demonstrating that analytical fidelity is maintained when data is physically separated across institutional nodes.
-* **Ground Truth Validation:** Assessing whether discovered subtypes align with the simulated interaction rules.
-
-## Workflow
-
-<img width="4189" height="4660" alt="RAIDer flow (4)" src="https://github.com/user-attachments/assets/7db58648-2f63-4bd9-8430-7fc50c8cfe12" />
-
+<img width="6518" height="4170" alt="workflow_flowchart_v3" src="https://github.com/user-attachments/assets/c6cff9cb-5d96-4892-a901-a229b7210376" />
 
 ---
 
-## 1. Pipeline Execution
+## 🎯 Scientific Objectives
 
-To initialize the pipeline from synthetic cohort generation through federated clustering:
+- **Subtype Discovery:** Identify coherent molecular signatures across diverse ancestral backgrounds using federated machine learning
+- **Pathway-Level Analysis:** Map genetic variants to biological mechanisms to understand disease heterogeneity
+- **Federated Feasibility:** Demonstrate that analytical fidelity is maintained when data remains physically separated across institutional nodes
+- **Therapeutic Stratification:** Enable precision medicine approaches by identifying distinct molecular subtypes requiring different therapeutic strategies
+
+---
+
+## 📊 Project Phases
+
+| Phase | Status | Description |
+|:-----:|:------:|:------------|
+| **Phase 1** | ✅ Complete | Federated K-means clustering for molecular subtype discovery |
+| **Phase 2** | ✅ Complete | Mechanistic pathway annotation and statistical analysis |
+| **Phase 3** | 🔄 In Progress | Multi-institutional collaboration and real-world validation |
+
+---
+
+## 🧬 Phase 1: Federated Subtype Discovery
+
+### Synthetic Cohort Generation
+
+To overcome the "mathematical invisibility" of rare variants, RAIDers employs a digital mutagenesis strategy generating a balanced cohort of **15,000 synthetic patients** partitioned across five ancestral superpopulations (AFR, AMR, EAS, EUR, SAS; n=3,000 each).
+
+**Data Sources:**
+- **ClinVar:** ~450 pathogenic ALS variants across 34 genes
+- **gnomAD:** Population-specific allele frequencies for ancestral modifiers
+
+### Federated K-Means Clustering
+
+Molecular subtypes are discovered through a privacy-preserving decentralized algorithm:
+
+1. **Local Computation:** Each population node computes cluster assignments using local patient data
+2. **Secure Aggregation:** Only centroids (not patient data) are shared with a central coordinator
+3. **Global Update:** Federated averaging produces updated global centroids
+4. **Convergence:** Process repeats until centroid change < 0.001
+
+### Phase 1 Results
+
+The algorithm identified **5 distinct clusters** with clear clinical stratification:
+
+| Cluster | n | Mean Severity | Progression | Interpretation |
+|:-------:|:-:|:-------------:|:-----------:|:---------------|
+| C0 | 287 | 5.00 | 74% Slow | Mild |
+| C1 | 3,287 | 7.27 | 93% Moderate | Moderate-A (SOD1-like) |
+| C2 | 1,999 | 9.30 | 97% Fast | Severe |
+| C3 | 8,957 | 0.00 | N/A | Control (No variants) |
+| C4 | 845 | 6.32 | 91% Moderate | Moderate-B (ALS2-like) |
+
+**Key Finding:** Clusters 1 and 4 both represent moderate severity but exhibit distinct molecular profiles, providing evidence for **severity-stratified molecular subtypes**.
+
+---
+
+## 🔬 Phase 2: Mechanistic Pathway Analysis
+
+### Pathway Annotation Framework
+
+Phase 2 maps the 34 ALS-associated genes to **7 canonical molecular pathways**:
+
+| Pathway | Genes | Representative |
+|:--------|:-----:|:---------------|
+| Proteostasis | 8 | *SOD1, C9orf72, VCP, TBK1* |
+| RNA Metabolism | 7 | *TARDBP, FUS, MATR3, HNRNPA1* |
+| Vesicle Trafficking | 5 | *ALS2, CHMP2B, VAPB, FIG4* |
+| Cytoskeletal/Axonal | 5 | *TUBA4A, PFN1, DCTN1, KIF5A* |
+| Mitochondrial | 4 | *CHCHD10, SIGMAR1* |
+| DNA Damage | 4 | *NEK1, SETX, SPG11* |
+| Excitotoxicity | 4 | *UNC13A, DAO* |
+
+### Statistical Analysis Suite
+
+Phase 2 implements comprehensive statistical methods:
+
+- **Co-occurrence Analysis:** Odds ratios, Jaccard similarity, Fisher's exact test
+- **Correlation Analysis:** Spearman ρ and Pearson *r* for pathway burden scores
+- **Quadrant Classification:** Biological categorization of pathway relationships
+- **Cross-Cluster Comparison:** Kruskal-Wallis tests with effect sizes (ε², Cohen's h)
+
+### Phase 2 Key Findings
+
+#### 1. Dose-Dependent Relationship
+The **Mitochondrial-Excitotoxicity axis** emerged as the dominant mechanistic link:
+- Co-occurrence: 86.5%
+- Correlation: *r* = 0.687
+- Odds Ratio: 38.78 (95% CI: 33.23–45.27)
+
+This suggests cascading molecular failure where mitochondrial dysfunction drives excitotoxicity.
+
+#### 2. Distinct Molecular Subtypes
+**Proteostasis-Vesicle Trafficking** mutual exclusivity:
+- Co-occurrence: 24.4%
+- Correlation: *r* = −0.408
+- Odds Ratio: 0.11
+
+Indicates these pathways represent **separate disease aetiologies** rather than co-occurring mechanisms.
+
+#### 3. Severity-Associated Gradients
+| Pathway | Trend (Mild → Severe) | Cohen's h |
+|:--------|:---------------------:|:---------:|
+| Proteostasis | ↑ 0% → 73% | 2.05 (Large) |
+| RNA Metabolism | ↑ 0% → 27% | 1.09 (Large) |
+| Vesicle Trafficking | ↓ 46% → 14% | 0.73 (Medium) |
+| DNA Damage | ↓ 42% → 10% | 0.77 (Medium) |
+
+---
+
+## 🚀 Quick Start
+
+### Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/project/RAIDers.git
+git clone https://github.com/your-org/RAIDers.git
 cd RAIDers
 
-# Run the primary simulation and analysis (Filename TBD)
-python main_pipeline.py
-
+# Install dependencies
+pip install -r requirements.txt
 ```
 
-*Note: A curated version of `clinvar.cleaned.csv` must be present in the local directory for execution.*
+### Running the Full Pipeline
 
----
+```bash
+# Execute Phase 1 + Phase 2 pipeline
+python main.py
+```
 
-## 2. Synthetic Cohort Generation
-
-To overcome the "mathematical invisibility" of rare variants in standard population samples, RAIDers employs a digital mutagenesis strategy. This allows for the generation of a balanced, statistically significant cohort of 15,000 patients partitioned into five ancestral nodes.
-
-### 2.1 Genomic Anchors: ClinVar
-
-The pipeline utilizes `clinvar.cleaned.csv` to identify approximately 450 pathogenic ALS variants. These records provide the biological ground truth for the simulation, including:
-
-* **Gene Association:** (e.g., *SOD1, TARDBP, C9orf72*)
-* **Clinical Significance:** Standardized pathogenicity classifications.
-* **Molecular Consequence:** Variant-level impact (missense, nonsense, frameshift).
-  
-
-### 2.2 The Interaction Model: gnomAD AF Integration
-
-Rather than using static lookups, we simulate variable penetrance by treating the ancestral background as a clinical modifier. We utilize **gnomAD** as our Genomic Reference Frame. Specifically, we adopt gnomAD’s **superpopulation divisions** and **relative allelic ratios** to construct 'Ancestral Modifiers,' allowing us to simulate how different genomic backgrounds influence clinical expression. We then utilize **gnomAD Allele Frequency (AF)** logic to determine population-specific "tolerance" to pathogenic variants.
-
-**Rationale for AF Estimation:**
-Empirical gnomAD frequencies for rare ALS variants are often  or zero in specific subpopulations. Direct application would result in a sparse matrix with insufficient carrier counts for machine learning. We estimate and amplify these frequencies (targeting 0.01% – 0.2%) to ensure analytical viability while maintaining biological realism through Selection penalties (e.g., a 50% AF reduction for Loss-of-Function mutations).
-
-### 2.3 Phenotype Severity Assignment Logic
-
-Clinical labels (e.g., Fast vs. Slow Progression) are derived from the interaction between a variant’s baseline impact and its ancestral modifier (the AF Ratio).
+### Running Individual Components
 
 ```python
-def assign_contextual_phenotype(variant_row, population_id):
-    # 1. Mutation Impact (Anchor derived from ClinVar)
-    base_impact = 0.8 if "Pathogenic" in variant_row['clinical_sig'] else 0.5
-    
-    # 2. Ancestral Modifier (gnomAD AF Ratio)
-    # High AF ratio implies population tolerance (Protective Modifier)
-    # Low AF ratio implies population sensitivity (Aggravating Modifier)
-    af_ratio = variant_row[f'gnomAD_AF_{population_id}'] / variant_row['gnomAD_AF']
-    modifier = 0.8 if af_ratio > 1.5 else (1.2 if af_ratio < 0.5 else 1.0)
-    
-    # 3. Probabilistic Interaction (with 5-10% stochastic noise)
-    interaction_score = (base_impact * modifier) + np.random.normal(0, 0.05)
-    
-    return "Fast Progression" if interaction_score > 0.85 else "Slow Progression"
+# Phase 1: Federated Clustering
+from fed_kmeans_components import FederatedKMeans
+
+clusterer = FederatedKMeans(n_clusters=5, n_populations=5)
+clusters = clusterer.fit(patient_features)
+
+# Phase 2: Pathway Analysis
+from phase2_pathway_annotation import PathwayAnnotator
+
+annotator = PathwayAnnotator(gene_pathway_map='data/gene_pathway_map.json')
+pathway_scores = annotator.annotate_patients(patient_variants)
+```
+
+### Interactive Dashboard
+
+Open `als_pathway_dashboard_clusters.html` in a web browser to explore:
+- Pathway prevalence by cluster
+- Co-occurrence heatmaps
+- Correlation matrices
+- Quadrant classification scatter plot
+- Network visualization
+
+---
+
+## 📁 Repository Structure
 
 ```
+RAIDers/
+├── main.py                          # Main pipeline orchestrator
+├── fed_kmeans_components.py         # Federated K-means implementation
+├── phase2_pathway_annotation.py     # Pathway annotation and analysis
+├── stage4_pathway_analysis.py       # Statistical analysis suite
+├── generate_figures.py              # Publication figure generation
+├── als_pathway_dashboard.html       # Interactive visualization
+├── data/
+│   ├── clinvar.cleaned.csv          # Curated pathogenic variants
+│   ├── gene_pathway_map.json        # Gene-to-pathway mappings
+│   └── outputs/                     # Analysis results (CSV, XLSX)
+├── notebooks/
+│   ├── total_pipeline.ipynb         # End-to-end tutorial
+│   └── biological_validation.ipynb  # Validation analyses
+└── docs/
+    ├── METHODOLOGY.md               # Detailed methods
+    └── figures/                      # Generated figures
+```
+
 ---
 
-## 3. Federated Analysis: Subtype Discovery
+## 🔮 Phase 3: Multi-Institutional Collaboration (In Progress)
 
-The framework simulates five institutional silos partitioned by superpopulation (AFR, AMR, EAS, EUR, SAS).
+Phase 3 extends RAIDers to real-world multi-institutional deployment:
 
-### 3.1 Federated Learning Across Simulated Hospitals 
+### Objectives
+- **Real Biobank Integration:** Validation on controlled-access datasets (UK Biobank, All of Us)
+- **Swarm Learning:** Transition from centralized to fully decentralized federated learning
+- **Clinical Validation:** Correlation with longitudinal patient outcomes
+- **Therapeutic Targeting:** Pathway-specific drug repurposing analysis
 
-Molecular subtypes are discovered through a decentralized K-Means algorithm:
+### Collaboration Opportunities
 
-* **Local Iteration:** Clients compute cluster assignments and centroids based on local synthetic cohorts.
-* **Global Aggregation:** Centroids are sent to a central server for federated averaging.
-* **Broadcast:** Updated global centroids are returned to clients; the process repeats until convergence (change < 0.001).
+We welcome collaborations with:
+- Rare disease research consortia
+- Biobank data custodians
+- Pharmaceutical partners for therapeutic validation
+- Computational biology groups
 
-### 3.2 Analytical Metrics
+**Contact:** [See Contributors section below]
 
-* **Computational Validation:** Evaluates the cohesion and separation of discovered molecular clusters using silhouette scores and within-cluster sum of squares.
-<div style="display:flex; gap:10px;">
-<img width="1212" alt="image" src="https://github.com/user-attachments/assets/cfd99a75-3d5b-482a-9e55-9d73c2bb1d50" />
-</div>
-<div align="center">
-<img width="480" alt="image" src="https://github.com/user-attachments/assets/0d772f44-19a5-4497-b835-ce9ddc5dd32e" />
-</div>
-
-![PPtSlide_4](InteractionLogic.pptx-4.png)
 ---
 
+## 📈 Data Sources
 
-## 4. Future Directions
+| Database | Purpose | Phase |
+|:--------:|:--------|:-----:|
+| [**ClinVar**](https://www.ncbi.nlm.nih.gov/clinvar/) | Pathogenic variant curation | 1, 2 |
+| [**gnomAD**](https://gnomad.broadinstitute.org) | Population allele frequencies | 1 |
+| [**OMIM**](https://www.omim.org) | Gene-disease associations | 2 |
+| [**Orphanet**](https://www.orpha.net) | Rare disease ontologies | 2, 3 |
+| [**Reactome**](https://reactome.org) | Pathway definitions | 2 |
 
-**Biological Validation**
-  - Evaluate if patients with variants in genes associated with specific ALS subtypes are clustered together.
+---
 
-**Richer simulated patient data**
-  - Extend the simulated cohort by incorporating additional biological/clinical features derived from prior work, such as:
-    - Patient "background" genotypes around mutations
-    - Phenotypic annotations (HPO)
-    - Protein expression levels
-    - Pathway or network-level features (Orphanet)
-  - This would allow evaluation of how the models handle diverse biobank-style data modalities beyond the current setup.
- 
-**Learning paradigms**
-  - **Unsupervised approaches** to identify latent structure and patient subgroups without predefined labels.
-  - **Supervised or semi-supervised approaches** when labels (e.g., subtype labeling, patient outcome) are available
-  - Determine which models best capture patient heterogeneity/disease subtype structure
+## 📚 Citation
 
-**Evaluation on real biobank data**
-  - As a longer-term direction, apply our pipeline to real-world biobank datasets to assess performance, scalability, and robustness in practical settings.
+If you use RAIDers in your research, please cite:
 
-**Federated Learning**
-  - Move from NVFlare with a central server to swarm learning (also on NVFlare) with no single owner, so multiple biobanks and rare disease cohorts across countries can train together even when no one can run a shared hub
-  
+```bibtex
+@software{raiders2026,
+  title = {RAIDers: Federated Molecular Subtyping for Rare Disease},
+  author = {Shah, Aastha and Kharbanda, Arnav and others},
+  year = {2026},
+  url = {https://github.com/your-org/RAIDers}
+}
+```
 
-## Data Sources
+---
 
-| Database | Purpose |
-| :--: | :--: |
-| [**ClinVar**](https://www.ncbi.nlm.nih.gov/clinvar/) | Pathogenic Variant Curation | 
-| [**gnomAD**](https://gnomad.broadinstitute.org) | Gene & Variant Constraint Scores; Population AFs  | 
-| [**OMIM**](https://www.omim.org) / [**Orphanet**](https://www.orpha.net)| Clinical gene-disease associations |
+## 👥 Contributors
 
-# Contributors 
-|Name| Email | ORCID | Institution | 
-| :--: | :--: | :--: | :--: |
-| Aastha Shah | aasthashah.work@gmail.com | 0009-0008-7811-0177 | Queen's University Belfast |
-| Arnav Kharbanda | arnavkha@andrew.cmu.edu | 0009-0007-9195-9960 | Carnegie Mellon University | 
-| Bill Paseman | bill@rarekidneycancer.org | 0000-0002-5020-0866 | |
-| Chantera Lazard | lazard.c@northeastern.edu | 0009-0006-1367-3812 | Northeastern University | 
-| Jialan Ma | jialanma7@gmail.com |0009-0007-2670-9076 | Broad Institute of MIT and Harvard |
-| Kushal Koirala | kkoirala@unc.edu | 0009-0009-7935-4533 | University of North Carolina | 
-| Kyulin Kim | lynn.kim.24@ucl.ac.uk | 0009-0007-8976-2405 | University College London | 
-| Nikita Rajesh | | 0009-0009-9850-5261 | Carnegie Mellon University | 
-| Pu (Paul) Kao | gaopuo1234@gmail.com | 0009-0003-9047-0160 | National Taiwan University |
-| Shreya Nandakumar | | 0009-0006-9230-3659 | Carnegie Mellon University |
-| Vibha Acharya | via16@pitt.edu | 0000-0001-6598-0052 | University of Pittsburgh |
-| William Lu | wtlu@andrew.cmu.edu | 0000-0002-2768-1489 | Carnegie Mellon University |
+| Name | Email | ORCID | Institution |
+|:-----|:------|:------|:------------|
+| Aastha Shah | aasthashah.work@gmail.com | [0009-0008-7811-0177](https://orcid.org/0009-0008-7811-0177) | Queen's University Belfast |
+| Arnav Kharbanda | arnavkha@andrew.cmu.edu | [0009-0007-9195-9960](https://orcid.org/0009-0007-9195-9960) | Carnegie Mellon University |
+| Bill Paseman | bill@rarekidneycancer.org | [0000-0002-5020-0866](https://orcid.org/0000-0002-5020-0866) | |
+| Chantera Lazard | lazard.c@northeastern.edu | [0009-0006-1367-3812](https://orcid.org/0009-0006-1367-3812) | Northeastern University |
+| Jialan Ma | jialanma7@gmail.com | [0009-0007-2670-9076](https://orcid.org/0009-0007-2670-9076) | Broad Institute of MIT and Harvard |
+| Kushal Koirala | kkoirala@unc.edu | [0009-0009-7935-4533](https://orcid.org/0009-0009-7935-4533) | University of North Carolina |
+| Kyulin Kim | lynn.kim.24@ucl.ac.uk | [0009-0007-8976-2405](https://orcid.org/0009-0007-8976-2405) | University College London |
+| Nikita Rajesh | | [0009-0009-9850-5261](https://orcid.org/0009-0009-9850-5261) | Carnegie Mellon University |
+| Pu (Paul) Kao | gaopuo1234@gmail.com | [0009-0003-9047-0160](https://orcid.org/0009-0003-9047-0160) | National Taiwan University |
+| Shreya Nandakumar | | [0009-0006-9230-3659](https://orcid.org/0009-0006-9230-3659) | Carnegie Mellon University |
+| Vibha Acharya | via16@pitt.edu | [0000-0001-6598-0052](https://orcid.org/0000-0001-6598-0052) | University of Pittsburgh |
+| William Lu | wtlu@andrew.cmu.edu | [0000-0002-2768-1489](https://orcid.org/0000-0002-2768-1489) | Carnegie Mellon University |
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+<p align="center">
+  <i>Developed as part of the Rare Disease & AI Initiative</i>
+</p>
 
 
